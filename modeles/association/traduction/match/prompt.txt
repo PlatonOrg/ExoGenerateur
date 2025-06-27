@@ -1,0 +1,41 @@
+Génère un exercice d'association où l'utilisateur doit relier chaque terme à sa traduction correspondante, en utilisant les informations du glossaire fournies dans le corps de ma requête.
+
+Ton objectif est de créer un JSON qui suit STRICTEMENT le format ci-dessous.
+
+Le JSON généré doit inclure :
+
+    - title (chaîne de caractères) : Un titre court et pertinent pour l'exercice. Ce titre doit être rédigé dans la langue spécifiée par langueInst et refléter le contenu ou le type de l'exercice (par exemple : "Vocabulaire de l'IA : Traduction", "Termes Clés : Associer", "Associer les Traductions").
+
+    - instructions (chaîne de caractères) : Des instructions claires et conviviales pour l'utilisateur qui fera l'exercice. Ces instructions doivent être rédigées dans la langue spécifiée par langueInst (fournie dans info). Elles doivent clairement énoncer l'objectif de l'exercice (par exemple : "Associez chaque terme à sa traduction correcte.", "Trouvez la bonne traduction pour chaque concept.", "Mettez en relation le terme et sa traduction correspondante."). Il est impératif de NE PAS décrire la méthode d'interaction (par exemple : "Faites glisser...", "Cliquez ici...", "Tapez votre réponse...").
+
+    - questions (liste d'objets) : Cette liste contiendra les éléments que l'utilisateur devra associer. Il est impératif que tu génères un objet pour CHAQUE terme présent dans le glossaire que je te fournis. Chaque objet dans cette liste doit avoir les clés suivantes :
+
+        - term (chaîne de caractères) : Le terme exact du glossaire (dans la langue du terme, généralement le terme principal du glossaire).
+
+        - match (chaîne de caractères) : La traduction exacte du terme correspondant. Les valeurs de term et match DOIVENT être extraites directement et fidèlement des données du glossaire que je te fournis, en utilisant le champ term pour le terme et le champ translation (en sélectionnant la langue cible appropriée, par exemple "Francais" si langueInst est le français) pour la traduction, sans modification ni paraphrase.
+
+        - correct_answer (chaîne de caractères) : La chaîne exacte du term (valeur identique à la clé term).
+
+Exemple du format JSON attendu (adapte les termes et traductions aux données réelles que je te donne, en utilisant le champ translation approprié) :
+
+{
+    "title": "Rail Transport: Term-Translation Matching",
+    "instructions": "Match each term to its correct translation.",
+    "questions": [
+        {
+            "term": "Rolling stock",
+            "match": "Matériel roulant",
+            "correct_answer": "Rolling stock"
+        },
+        {
+            "term": "Locomotive",
+            "match": "Locomotive",
+            "correct_answer": "Locomotive"
+        },
+        {
+            "term": "Passenger car",
+            "match": "Voiture de voyageur",
+            "correct_answer": "Passenger car"
+        }
+    ]
+}

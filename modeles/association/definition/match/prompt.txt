@@ -1,0 +1,41 @@
+Génère un exercice d'association où l'utilisateur doit relier chaque terme à son élément correspondant, en utilisant les informations du glossaire fournies dans le corps de ma requête.
+
+Ton objectif est de créer un JSON qui suit STRICTEMENT le format ci-dessous.
+
+Le JSON généré doit inclure :
+
+    - title (chaîne de caractères) : Un titre court et pertinent pour l'exercice. Ce titre doit être rédigé dans la langue spécifiée par langueInst et refléter le contenu ou le type de l'exercice (par exemple : "Vocabulaire de l'IA : Association", "Concepts Clés", "Associer les Termes et Contenus").
+
+    - instructions (chaîne de caractères) : Des instructions claires et conviviales pour l'utilisateur qui fera l'exercice. Ces instructions doivent être rédigées dans la langue spécifiée par langueInst dans les informations supplémentaires du prompt principal. Les instructions doivent clairement énoncer l'objectif de l'exercice (par exemple : "Associez chaque terme à son élément correspondant.", "Trouvez le bon contenu pour chaque concept.", "Mettez en relation le terme et son élément associé."). Il est impératif de NE PAS décrire la méthode d'interaction (par exemple : "Faites glisser...", "Cliquez ici...", "Tapez votre réponse...").
+
+    - questions (liste d'objets) : Cette liste contiendra les éléments que l'utilisateur devra associer. Il est impératif que tu génères un objet pour CHAQUE terme présent dans le glossaire que je te fournis. Chaque objet dans cette liste doit avoir les clés suivantes :
+
+        - term (chaîne de caractères) : Le terme exact du glossaire (dans la langue du terme).
+
+        - match (chaîne de caractères) : L'élément exact (par exemple, la définition ou une description) qui correspond au terme. Les valeurs de term et match DOIVENT être extraites directement et fidèlement des données du glossaire que je te fournis, sans modification ni paraphrase.
+
+        - correct_answer (chaîne de caractères) : La chaîne exacte du term (valeur identique à la clé term).
+
+Exemple du format JSON attendu (adapte les termes et éléments de match aux données réelles que je te donne) :
+
+{
+    "title": "AI Vocabulary: Matching",
+    "instructions": "Match each term to its correct corresponding element.",
+    "questions": [
+        {
+            "term": "Artificial Intelligence",
+            "match": "A branch of computer science dealing with the simulation of intelligent behavior in computers.",
+            "correct_answer": "Artificial Intelligence"
+        },
+        {
+            "term": "Machine Learning",
+            "match": "A subfield of AI that enables systems to learn from data without being explicitly programmed.",
+            "correct_answer": "Machine Learning"
+        },
+        {
+            "term": "Neural Network",
+            "match": "A model inspired by the human brain, used in deep learning to process information.",
+            "correct_answer": "Neural Network"
+        }
+    ]
+}

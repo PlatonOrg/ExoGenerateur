@@ -1,0 +1,62 @@
+Génère un exercice de type "picker" où l'utilisateur doit choisir la traduction correcte pour un terme donné, ou vice-versa, en utilisant les informations du glossaire fournies dans le corps de ma requête.
+
+Ton objectif est de créer un JSON qui suit STRICTEMENT le format ci-dessous.
+
+Le JSON généré doit inclure :
+
+    - title (chaîne de caractères) : Un titre court et pertinent pour l'exercice. Ce titre doit être rédigé dans la langue spécifiée par langueInst et refléter le contenu ou le type de l'exercice (par exemple : "Quiz de Vocabulaire", "Traductions à Choisir", "Termes Clés : Traduction").
+
+    - instructions (chaîne de caractères) : Des instructions claires et conviviales pour l'utilisateur qui fera l'exercice. Ces instructions doivent être rédigées dans la langue spécifiée par langueInst dans les informations supplémentaires du prompt principal. Les instructions doivent clairement énoncer l'objectif de l'exercice (par exemple : "Sélectionnez la bonne traduction pour chaque terme.", "Choisissez le terme qui correspond à la traduction.", "Trouvez la meilleure correspondance."). Il est impératif de NE PAS décrire la méthode d'interaction (par exemple : "Cliquez sur...", "Tapez votre réponse...", "Utilisez le menu déroulant...").
+
+    - questions (liste d'objets) : Cette liste contiendra les questions de l'exercice. Il est impératif que tu génères une seule question pour CHAQUE terme présent dans le glossaire que je te fournis. Pour chaque terme du glossaire, tu devras alterner le type de question générée entre les deux formats suivants :
+        - Type 1 (Terme vers Traduction) : La question demande la traduction d'un terme du glossaire. La question_text sera "Quelle est la traduction de '[Terme Anglais]' ?". Les options seront des traductions (en langueTraduction), et la correct_answer sera la traduction du term dans langueTraduction.
+        - Type 2 (Traduction vers Terme) : La question donne une traduction et demande le terme original. La question_text sera "Quel terme correspond à la traduction : '[Traduction Française]' ?". Les options seront des termes (en langueDefinition), et la correct_answer sera le term du glossaire.
+
+    - Chaque objet dans cette liste doit avoir les clés suivantes :
+        - term (chaîne de caractères) : Le terme exact du glossaire (dans sa langue d'origine, par exemple "Hello" ou "Hi"). Ce term est la clé de l'entrée du glossaire à laquelle la question est liée.
+        - question_text (chaîne de caractères) : Le texte de la question posée, formulé selon le type de question choisi pour ce term. La langue de la question doit être celle de langueInst.
+        - options (liste de chaînes de caractères) : Une liste de 3 à 5 options de réponse, incluant la bonne réponse et des distracteurs plausibles.
+            - Si la question est de Type 1 (Terme vers Traduction), les options et la correct_answer doivent être des traductions (en langueTraduction) provenant du glossaire.
+            - Si la question est de Type 2 (Traduction vers Terme), les options et la correct_answer doivent être des termes (en langueDefinition) provenant du glossaire.
+            - Toutes les options (et la bonne réponse) DOIVENT être extraites directement et fidèlement des champs term ou translation du glossaire que je te fournis, sans modification ni paraphrase.
+        - correct_answer (chaîne de caractères) : La chaîne exacte de l'option correcte parmi les options.
+
+Exemple du format JSON attendu (adapte les termes, traductions et options aux données réelles que tu me donnes) :
+
+{
+    "title": "Quiz de Traduction",
+    "instructions": "Sélectionnez la traduction correcte pour chaque terme, ou choisissez le terme qui correspond à la traduction.",
+    "questions": [
+        {
+            "term": "Hello",
+            "question_text": "Quelle est la traduction de 'Hello' ?",
+            "options": [
+                "Salut",
+                "Bonjour",
+                "Au revoir"
+            ],
+            "correct_answer": "Bonjour"
+        },
+        {
+            "term": "Hi",
+            "question_text": "Quel terme correspond à la traduction : 'Salut' ?",
+            "options": [
+                "Hello",
+                "Hi",
+                "Goodbye"
+            ],
+            "correct_answer": "Hi"
+        },
+        {
+            "term": "My name is...",
+            "question_text": "Quelle est la traduction de 'My name is...' ?",
+            "options": [
+                "Je suis...",
+                "Je m'appelle...",
+                "Enchanté(e)"
+            ],
+            "correct_answer": "Je m'appelle..."
+        }
+        // ... et ainsi de suite, en alternant les types de questions pour chaque terme du glossaire.
+    ]
+}

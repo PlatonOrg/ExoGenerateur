@@ -1,0 +1,58 @@
+Compris ! Vous voulez une contrainte supplémentaire pour l'exercice "Identifier le terme" : le terme cible ne doit apparaître qu'une seule et unique fois dans la phrase fournie (sentence). C'est une excellente façon de rendre l'exercice plus précis et de s'assurer que l'utilisateur n'est pas distrait par des occurrences multiples du même mot.
+
+Voici le prompt modifié avec cette nouvelle contrainte :
+
+Génère un exercice où l'utilisateur doit identifier un terme spécifique dans une phrase, après avoir lu sa définition et la phrase en question.
+
+Ton objectif est de créer un JSON qui suit STRICTEMENT le format ci-dessous.
+
+Le JSON généré doit inclure :
+
+    - title (chaîne de caractères) : Un titre court et pertinent pour l'exercice. Ce titre doit être rédigé dans la langue spécifiée par langueInst et refléter le contenu ou le type de l'exercice (par exemple : "Trouvez le terme dans la phrase", "Vocabulaire : Terme et Contexte", "Identifier le concept").
+    - instructions (chaîne de caractères) : Des instructions claires et conviviales pour l'utilisateur. Ces instructions doivent être rédigées dans la langue spécifiée par langueInst dans les informations supplémentaires du prompt principal. Elles doivent clairement énoncer l'objectif de l'exercice (par exemple : "Lisez la définition et la phrase, puis identifiez le terme du glossaire utilisé dans la phrase.", "À partir de la définition, trouvez le mot correspondant dans la phrase.", "Quel terme décrit cette phrase ?"). Il est impératif de NE PAS décrire la méthode d'interaction (par exemple : "Cliquez sur...", "Tapez votre réponse...", "Utilisez le menu déroulant...").
+    - questions (liste d'objets) : Cette liste contiendra les éléments de chaque question. Il est impératif que tu génères une question pour CHAQUE terme présent dans le glossaire que je te fournis. Chaque objet dans cette liste doit avoir les clés suivantes :
+        - term (chaîne de caractères) : Le terme exact du glossaire qui est la cible de la question. Ce terme DOIT être extrait directement et fidèlement des données du glossaire que je te fournis, sans modification ni paraphrase.
+        - definition (chaîne de caractères) : La définition exacte du term telle qu'elle est fournie dans le glossaire. Cette définition DOIT être extraite directement et fidèlement des données du glossaire que je te fournis, sans modification ni paraphrase.
+        - sentence (chaîne de caractères) : Une phrase dans la langue du term (la langue principale du glossaire, par exemple "Anglais" si la matiere est "Anglais") qui utilise le term de manière naturelle.
+        - correct_answer (chaîne de caractères) : La chaîne exacte du term (valeur identique à la clé term).
+
+Contraintes supplémentaires pour les phrases :
+
+    - La phrase doit être pertinente au theme et aux indications supplémentaires fournies dans info.
+    - Chaque phrase doit être unique et clairement contextualiser le term désigné.
+    - Assure-toi que la complexité de la phrase est adaptée à la cible et à la personnalite (ton/style) si ces informations sont disponibles.
+    - Le term doit être présent explicitement dans la sentence.
+    - Contrainte spécifique : Le term ne doit apparaître qu'une seule et UNIQUE fois dans la sentence fournie.
+
+Exemple du format JSON attendu (adapte les termes, définitions et phrases aux données réelles de ton glossaire) :
+
+{
+    "title": "Anglais : Identifiez le terme",
+    "instructions": "Lisez la définition et la phrase, puis identifiez le terme du glossaire utilisé dans la phrase.",
+    "questions": [
+        {
+            "term": "Hello",
+            "definition": "A common greeting used to initiate a conversation.",
+            "sentence": "She started the conversation with a warm Hello.",
+            "correct_answer": "Hello"
+        },
+        {
+            "term": "Hi",
+            "definition": "A more informal greeting, similar to 'hello'.",
+            "sentence": "He just said Hi quickly and then left.",
+            "correct_answer": "Hi"
+        },
+        {
+            "term": "name",
+            "definition": "The word or set of words by which a person, animal, place, or thing is known, addressed, or referred to.",
+            "sentence": "What is your name?",
+            "correct_answer": "name"
+        },
+        {
+            "term": "travel",
+            "definition": "To make a journey, typically of some length or abroad.",
+            "sentence": "I love to travel during the summer.",
+            "correct_answer": "travel"
+        }
+    ]
+}

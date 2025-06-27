@@ -1,0 +1,58 @@
+Génère un exercice de "remise en ordre de mots" où l'utilisateur doit reconstruire des phrases à partir d'une liste de mots désordonnés.
+
+Ton objectif est de créer un JSON qui suit STRICTEMENT le format ci-dessous.
+
+Le JSON généré doit inclure :
+
+    - title (chaîne de caractères) : Un titre court et pertinent pour l'exercice. Ce titre doit être rédigé dans la langue spécifiée par langueInst et refléter le contenu ou le type de l'exercice (par exemple : "Remettez les mots dans l'ordre", "Construisez la phrase", "Ordre des mots et vocabulaire").
+
+    - instructions (chaîne de caractères) : Des instructions claires et conviviales pour l'utilisateur. Ces instructions doivent être rédigées dans la langue spécifiée par langueInst dans les informations supplémentaires du prompt principal. Elles doivent clairement énoncer l'objectif de l'exercice (par exemple : "Remettez les mots dans le bon ordre pour former une phrase correcte.", "Reconstruisez la phrase en arrangeant les mots donnés.", "Triez les mots pour former une phrase cohérente."). Il est impératif de NE PAS décrire la méthode d'interaction (par exemple : "Faites glisser...", "Cliquez ici...", "Tapez votre réponse...").
+
+    - questions (liste d'objets) : Cette liste contiendra les phrases à reconstruire. Il est impératif que tu génères une question pour CHAQUE terme présent dans le glossaire que je te fournis. Chaque objet dans cette liste doit avoir les clés suivantes :
+
+        - term (chaîne de caractères) : Le terme exact du glossaire qui est utilisé dans la phrase correcte. Ce terme DOIT être extrait directement et fidèlement des données du glossaire que je te fournis, sans modification ni paraphrase.
+
+        - scrambled_words (liste de chaînes de caractères) : Une liste de mots issus de la phrase correcte, mais dans un ordre aléatoire. Chaque mot doit inclure sa ponctuation associée s'il y en a une (par exemple, "English?", "world."). La phrase doit être dans la langue du term (la langue principale du glossaire, par exemple "Anglais" si la matiere est "Anglais").
+
+        - correct_sentence (liste de chaînes de caractères) : La phrase complète et correcte, décomposée en une liste de mots dans l'ordre, avec la ponctuation attachée aux mots appropriés.
+
+Contraintes supplémentaires pour les phrases :
+
+    - La phrase doit être pertinente au theme et aux indications supplémentaires fournies dans info.
+
+    - Chaque phrase doit être unique et clairement contextualiser le term désigné.
+
+    - Assure-toi que la complexité de la phrase est adaptée à la cible et à la personnalite (ton/style) si ces informations sont disponibles.
+
+    - Le nombre total de mots dans scrambled_words et correct_sentence (c'est-à-dire la longueur de la phrase) ne doit JAMAIS dépasser 10 mots.
+
+    - Les listes scrambled_words et correct_sentence doivent contenir STRICTEMENT les mêmes mots, avec la MÊME ORTHOGRAPHE exacte, y compris la casse (majuscules/minuscules) et la ponctuation attachée. La liste scrambled_words doit être une version désordonnée de correct_sentence.
+
+Exemple du format JSON attendu (adapte les termes et phrases aux données réelles de ton glossaire) :
+
+{
+    "title": "Anglais : Reconstruisez les phrases",
+    "instructions": "Remettez les mots dans le bon ordre pour former une phrase correcte.",
+    "questions": [
+        {
+            "term": "Hello",
+            "scrambled_words": ["started", "with", "Hello.", "she", "conversation", "a", "warm"],
+            "correct_sentence": ["She", "started", "a", "warm", "conversation", "with", "Hello."]
+        },
+        {
+            "term": "name",
+            "scrambled_words": ["your", "name?", "tell", "me", "could", "please"],
+            "correct_sentence": ["Could", "you", "please", "tell", "me", "your", "name?"]
+        },
+        {
+            "term": "travel",
+            "scrambled_words": ["explore", "new", "to", "and", "countries.", "I", "love", "travel"],
+            "correct_sentence": ["I", "love", "to", "travel", "and", "explore", "new", "countries."]
+        },
+        {
+            "term": "speak",
+            "scrambled_words": ["English?", "you", "do", "speak"],
+            "correct_sentence": ["Do", "you", "speak", "English?"]
+        }
+    ]
+}

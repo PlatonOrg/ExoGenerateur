@@ -1,0 +1,91 @@
+Génère un exercice de type "phrase à trous à choix multiples" où l'utilisateur doit compléter des phrases en sélectionnant le terme correct parmi une liste d'options.
+
+Ton objectif est de créer un JSON qui suit STRICTEMENT le format ci-dessous.
+
+Le JSON généré doit inclure :
+
+    title (chaîne de caractères) : Un titre court et pertinent pour l'exercice. Ce titre doit être rédigé dans la langue spécifiée par langueInst et refléter le contenu ou le type de l'exercice (par exemple : "Choisissez le bon mot", "Pièges de vocabulaire", "Complétez avec le terme juste").
+    instructions (chaîne de caractères) : Des instructions claires et conviviales pour l'utilisateur. Ces instructions doivent être rédigées dans la langue spécifiée par langueInst dans les informations supplémentaires du prompt principal. Elles doivent clairement énoncer l'objectif de l'exercice (par exemple : "Lisez chaque phrase et sélectionnez le terme du glossaire qui la complète correctement.", "Choisissez le mot manquant parmi les options proposées.", "Identifiez le terme approprié pour chaque blanc."). Il est impératif de NE PAS décrire la méthode d'interaction (par exemple : "Cliquez sur...", "Tapez votre réponse...", "Utilisez le menu déroulant...").
+    questions (liste d'objets) : Cette liste contiendra les phrases à compléter et leurs options. Il est impératif que tu génères une phrase pour CHAQUE terme présent dans le glossaire que je te fournis. Chaque objet dans cette liste doit avoir les clés suivantes :
+        term (chaîne de caractères) : Le terme exact du glossaire qui est la bonne réponse pour cette phrase. Ce terme DOIT être extrait directement et fidèlement des données du glossaire que je te fournis, sans modification ni paraphrase.
+        sentence (chaîne de caractères) : Une phrase dans la langue du term (la langue principale du glossaire, par exemple "Anglais" si la matiere est "Anglais") où le term a été remplacé par un espace vide ou un marqueur clair (par exemple, ___ ou [BLANK]). La phrase doit clairement contextualiser le term sans le mentionner explicitement ailleurs que dans le term lui-même.
+        options (liste de chaînes de caractères) : Une liste de 3 à 5 options de réponse, incluant la bonne réponse (term) et des distracteurs. Les distracteurs doivent être créés spécifiquement pour piéger l'utilisateur en ressemblant au term correct. Il est impératif que les distracteurs d'orthographe ou de phonétique soient subtils et crédibles, reflétant des erreurs courantes ou des mots phonétiquement proches qui pourraient réellement prêter à confusion. Ces pièges peuvent inclure :
+            Fautes d'orthographe réalistes et courantes du term ou de mots similaires (par exemple, "Greating" pour "Greeting", "beleive" pour "believe", "seperate" pour "separate"). Évite les fautes trop évidentes ou "forcées" (comme doubler une lettre sans raison contextuelle).
+            Mots à la phonétique similaire au term (homophones ou quasi-homophones) mais de sens différent dans le contexte (par exemple, "there" pour "their", "flour" pour "flower").
+            Erreurs de concordance des temps ou de forme grammaticale si le term est un verbe (par exemple, "spoke" ou "speaking" pour "speak" si l'infinitif est attendu, ou une forme incorrecte).
+            Mots de sens proche mais incorrect dans le contexte précis de la phrase (synonymes qui ne conviennent pas parfaitement).
+            Tous les termes des options doivent être présentés dans la même langue que le term original.
+        correct_answer (chaîne de caractères) : La chaîne exacte de l'option correcte parmi les options (qui doit être la valeur du term pour cette question).
+
+Contraintes supplémentaires pour les phrases et les options :
+
+    La phrase doit être pertinente au theme et aux indications supplémentaires fournies dans info.
+    Chaque phrase doit être unique et clairement associée au term désigné.
+    Assure-toi que la complexité de la phrase est adaptée à la cible et à la personnalite (ton/style) si ces informations sont disponibles.
+    Si le term est un verbe à l'infinitif, la phrase peut le conjuguer ou l'adapter morphologiquement au contexte, mais le correct_answer doit rester le term original (l'infinitif). Les options doivent alors inclure des conjugaisons incorrectes ou des verbes phonétiquement proches.
+    Les options distractrices doivent être crédibles et pertinentes pour l'apprentissage de la langue (c'est-à-dire qu'elles reflètent des erreurs courantes ou des confusions possibles).
+
+Exemple du format JSON attendu (adapte les termes et phrases aux données réelles de ton glossaire) :
+JSON
+
+{
+    "title": "Anglais : Complétez les phrases",
+    "instructions": "Lisez chaque phrase et sélectionnez le terme du glossaire qui la complète correctement.",
+    "questions": [
+        {
+            "term": "hello",
+            "sentence": "She started the conversation with a warm ___.",
+            "options": [
+                "hello",
+                "hallo",
+                "hellow",
+                "hillo"
+            ],
+            "correct_answer": "hello"
+        },
+        {
+            "term": "name",
+            "sentence": "Could you please tell me your ___?",
+            "options": [
+                "name",
+                "nane",
+                "gnome",
+                "naim"
+            ],
+            "correct_answer": "name"
+        },
+        {
+            "term": "travel",
+            "sentence": "I love to ___ and explore new countries.",
+            "options": [
+                "travel",
+                "travell",
+                "traval",
+                "trawel"
+            ],
+            "correct_answer": "travel"
+        },
+        {
+            "term": "speak",
+            "sentence": "Do you ___ English?",
+            "options": [
+                "speak",
+                "spoke",
+                "speek",
+                "spike"
+            ],
+            "correct_answer": "speak"
+        },
+        {
+            "term": "Greeting",
+            "sentence": "He extended a friendly ___ to everyone in the room.",
+            "options": [
+                "Greeting",
+                "Greating",
+                "Gretting",
+                "Greting"
+            ],
+            "correct_answer": "Greeting"
+        }
+    ]
+}
