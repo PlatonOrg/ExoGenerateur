@@ -193,6 +193,10 @@ cython_debug/
 .cursorignore
 .cursorindexingignore
 
-# Local Tests Directory
+# Local tests directory
 # Put all your file needed for test in this directory
 test_prog/
+
+# output directory
+# exercise generate
+output/

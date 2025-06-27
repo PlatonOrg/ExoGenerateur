@@ -32,10 +32,10 @@ generate [name of the composant]
 create [name of a componant]
 
 
-# Technical ducumentation
+# Technical documentation
 
 ## Codebase Structure
 - default : default files needed to generate the exercice
-- modeles : folder with every componant that can be use to generate an exercice
+- modeles : prompt use to generate exercices
 - src     : folder for python files needed to run the interface
 - main.py : main file to run the interface
