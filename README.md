@@ -7,7 +7,7 @@ Clone the repository and run the install script :
 ```bash
 git clone https://github.com/PlatonOrg/ExoGenerateur.git
 cd ExoGenerateur
-./bin/install.sh
+./bin/install.sh # creation of virtual env
 ```
 
 ## Requirements:
@@ -15,7 +15,9 @@ cd ExoGenerateur
 - [`pip3`](https://pip.pypa.io/en/stable/installing/)
 - [`python >= 3.7`](https://www.python.org/)
 
-# Usage 
+# Usage
+
+
 To start working, activate your virtual environment with:
 
 ```bash
