@@ -97,7 +97,6 @@ def extract_glossaire(fileContent):
 def generate_glossaire(infoGeneral):
     """
     génére un glossaire
-    Renvoie la réponse de Gemini Json au format str
     """
     langueDefinition = "Anglais"
     langueTraduction = "Francais"
@@ -117,10 +116,14 @@ def generate_glossaire(infoGeneral):
                 "content": f"""Tu es un expert linguistique et terminologue de renom, spécialisé dans la création de glossaires techniques et conceptuels. Ton rôle est de générer un glossaire complet et précis sur le sujet spécifié par l'utilisateur. Pour chaque terme pertinent que tu identifieras ou créeras, tu devras fournir:
                 1.  Le terme lui-même.
                     ***RÈGLE ABSOLUE POUR LE 'TERM' : Le 'term' doit être un unique mot de dictionnaire, ou un nom composé très court (maximum 2-3 mots si inséparable, comme "Artificial Intelligence"). AUCUNE phrase, AUCUNE question, AUCUNE réponse, AUCUNE expression verbale avec "to" + verbe + complément, AUCUNE expression idiomatique longue.***
+                    
+                    ***RÈGLE DE CASSE POUR LE 'TERM' : Le 'term' DOIT commencer par une MINUSCULE, sauf s'il s'agit d'un NOM PROPRE (ex: "France", "Paris") ou d'un ACRONYME (ex: "NATO", "AI"). Pour tout autre terme, y compris les noms communs ou composés, il DOIT commencer par une minuscule. N'utilise JAMAIS de majuscule pour un nom commun, même s'il apparaît en début de phrase dans une définition.***
 
-                    **ACCEPTE UNIQUEMENT LES TERMES DE CE TYPE :**
-                    * **Mots uniques :** "Name", "Hello", "Hi", "Greeting", "Origin", "Meet", "Fine", "Introduce", "Travel", "Speak", "Locomotive", etc.
-                    * **Noms composés très courts (max 3 mots, formant un seul concept) :** "Handshake", "Thank you", "Artificial Intelligence", "Decision-making", "User interface".
+                    **ACCEPTE UNIQUEMENT LES TERMES DE CE TYPE ET CASSE :**
+                    * **Mots uniques (minuscule) :** "name", "hello", "hi", "greeting", "origin", "meet", "fine", "introduce", "travel", "speak", "locomotive", "age", etc.
+                    * **Noms propres (majuscule initiale) :** "France", "Paris", "Gemini".
+                    * **Acronymes (tout en majuscules) :** "NATO", "AI".
+                    * **Noms composés très courts (max 3 mots, formant un seul concept, minuscule initiale) :** "handshake", "thank you", "artificial intelligence", "decision-making", "user interface".
 
                     **REJETTE ABSOLUMENT ET NE DOIS JAMAIS GÉNÉRER CES TYPES DE 'TERM' :**
                     * **Phrases ou questions :** "My name is...", "How are you?", "I'm fine, thank you", "And you?", "Nice to meet you", "It's a pleasure to meet you", "Pleased to meet you".
@@ -142,7 +145,7 @@ def generate_glossaire(infoGeneral):
     ```json
     [
         {{
-            "term": "[Terme généré (mot unique ou expression nominale max 3 mots)]",
+            "term": "[Terme généré (mot unique ou expression nominale max 3 mots, avec minuscule sauf nom propre/acronyme)]",
             "definition": "[Définition du terme dans la langue souhaitée]",
             "translation": {{
                 "{langueDefinition}": "[Terme en langue de définition, ou sa traduction]",
@@ -151,7 +154,6 @@ def generate_glossaire(infoGeneral):
         }},
         // ... autres termes
     ]
-
     '''
     }
     ],
@@ -160,7 +162,6 @@ def generate_glossaire(infoGeneral):
     }
     
     return ask_gemini(json.dumps(prompt))
-
 ######### prompt
 
 def find_exo_prompt():
@@ -262,7 +263,7 @@ def generate_data(glossaire, generalInfo):
     Génère les données pour tous les exercices en regroupant les prompts deux par deux.
     """
     lstPrompt = find_exo_prompt()
-    savePrompt = 2
+    savePrompt = 1
 
     if not lstPrompt:
         print("Aucun fichier 'prompt.txt' trouvé dans le répertoire 'modeles'. Aucune donnée générée.")
