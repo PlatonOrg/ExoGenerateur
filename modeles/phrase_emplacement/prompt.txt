@@ -1,7 +1,3 @@
-Compris ! Vous voulez une contrainte supplémentaire pour l'exercice "Identifier le terme" : le terme cible ne doit apparaître qu'une seule et unique fois dans la phrase fournie (sentence). C'est une excellente façon de rendre l'exercice plus précis et de s'assurer que l'utilisateur n'est pas distrait par des occurrences multiples du même mot.
-
-Voici le prompt modifié avec cette nouvelle contrainte :
-
 Génère un exercice où l'utilisateur doit identifier un terme spécifique dans une phrase, après avoir lu sa définition et la phrase en question.
 
 Ton objectif est de créer un JSON qui suit STRICTEMENT le format ci-dessous.
@@ -14,7 +10,8 @@ Le JSON généré doit inclure :
         - term (chaîne de caractères) : Le terme exact du glossaire qui est la cible de la question. Ce terme DOIT être extrait directement et fidèlement des données du glossaire que je te fournis, sans modification ni paraphrase.
         - definition (chaîne de caractères) : La définition exacte du term telle qu'elle est fournie dans le glossaire. Cette définition DOIT être extraite directement et fidèlement des données du glossaire que je te fournis, sans modification ni paraphrase.
         - sentence (chaîne de caractères) : Une phrase dans la langue du term (la langue principale du glossaire, par exemple "Anglais" si la matiere est "Anglais") qui utilise le term de manière naturelle.
-        - correct_answer (chaîne de caractères) : La chaîne exacte du term (valeur identique à la clé term).
+            Règle de format pour 'sentence' : Chaque mot de la phrase (hors ponctuation) DOIT être enveloppé entre accolades `{}`. La ponctuation (points, virgules, points d'interrogation, points d'exclamation, etc.) DOIT être séparée du mot précédent par un ESPACE unique (ex: "{mot} .", "{mot} ," ).
+        - correct_answer (liste de chaînes de caractères) : **Une liste de chaînes de caractères représentant le terme correct. Si le terme contient plusieurs mots (ex: "small talk"), chaque mot du terme doit être un élément distinct de cette liste (délimiteur = ' '). La casse DOIT correspondre exactement à celle du 'term' original.**
 
 Contraintes supplémentaires pour les phrases :
 
@@ -26,6 +23,7 @@ Contraintes supplémentaires pour les phrases :
 
 Exemple du format JSON attendu (adapte les termes, définitions et phrases aux données réelles de ton glossaire) :
 
+```json
 {
     "title": "Anglais : Identifiez le terme",
     "instructions": "Lisez la définition et la phrase, puis identifiez le terme du glossaire utilisé dans la phrase.",
@@ -33,26 +31,32 @@ Exemple du format JSON attendu (adapte les termes, définitions et phrases aux d
         {
             "term": "Hello",
             "definition": "A common greeting used to initiate a conversation.",
-            "sentence": "She started the conversation with a warm Hello.",
-            "correct_answer": "Hello"
+            "sentence": "{She} {started} {the} {conversation} {with} {a} {warm} {Hello} .",
+            "correct_answer": ["Hello"]
         },
         {
             "term": "Hi",
             "definition": "A more informal greeting, similar to 'hello'.",
-            "sentence": "He just said Hi quickly and then left.",
-            "correct_answer": "Hi"
+            "sentence": "{He} {just} {said} {Hi} {quickly} {and} {then} {left} .",
+            "correct_answer": ["Hi"]
         },
         {
             "term": "name",
             "definition": "The word or set of words by which a person, animal, place, or thing is known, addressed, or referred to.",
-            "sentence": "What is your name?",
-            "correct_answer": "name"
+            "sentence": "{What} {is} {your} {name} ?",
+            "correct_answer": ["name"]
+        },
+        {
+            "term": "small talk",
+            "definition": "Polite conversation about unimportant or uncontroversial matters, especially as engaged in on social occasions.",
+            "sentence": "{We} {made} {some} {small} {talk} {before} {the} {meeting} {began} .",
+            "correct_answer": ["small", "talk"]
         },
         {
             "term": "travel",
             "definition": "To make a journey, typically of some length or abroad.",
-            "sentence": "I love to travel during the summer.",
-            "correct_answer": "travel"
+            "sentence": "{I} {love} {to} {travel} {during} {the} {summer} .",
+            "correct_answer": ["travel"]
         }
     ]
 }

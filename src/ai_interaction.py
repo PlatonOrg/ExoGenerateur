@@ -98,16 +98,14 @@ def generate_glossaire(infoGeneral):
     """
     génére un glossaire
     """
-    langueDefinition = "Anglais"
-    langueTraduction = "Francais"
-    
-    sujet = "matiére : " + infoGeneral["matiere"]
+    sujet = "matière : " + infoGeneral["matiere"]
     if infoGeneral["theme"] is not None:
         sujet += " , thème : " + infoGeneral["theme"]
         
     if infoGeneral["indicationSup"] is not None:
         sujet += " , indications supplémentaires : " + infoGeneral["indicationSup"]
-
+    langueDefinition = infoGeneral["matiere"]
+    langueTraduction = "Francais" 
     prompt = {
         "model": MODEL_TYPE,
         "messages": [
@@ -130,6 +128,7 @@ def generate_glossaire(infoGeneral):
                     * **Expressions verbales longues ou avec compléments :** "To introduce oneself", "To meet someone", "Come from".
 
                 2.  Une définition concise et claire, rédigée en {langueDefinition}.
+                    ***CONTRAINTE DE DÉFINITION : La définition DOIT être simple à comprendre, complète, et ne DOIT PAS contenir le terme qu'elle définit afin d'éviter toute circularité et de garantir une explication autonome.***
                 3.  Des traductions pour ce terme. L'objet 'translation' DOIT toujours inclure les clés '{langueDefinition}' et '{langueTraduction}'. Si un terme est déjà dans l'une de ces langues, la valeur de sa traduction pour cette langue peut être le terme lui-même (si universellement reconnu) ou une chaîne vide. Pour les autres cas, fournis la traduction appropriée.
 
                 Assure-toi que la sortie est un tableau JSON STRICTEMENT conforme au format spécifié, où chaque entrée représente un terme du glossaire. Maintiens une cohérence parfaite dans la structure des clés de l'objet 'translation' pour toutes les entrées. Concentre-toi sur les termes clés et les concepts fondamentaux du sujet.
@@ -149,7 +148,7 @@ def generate_glossaire(infoGeneral):
             "definition": "[Définition du terme dans la langue souhaitée]",
             "translation": {{
                 "{langueDefinition}": "[Terme en langue de définition, ou sa traduction]",
-                "{langueTraduction}": "[Traduction du terme dans la langue opposée, ou le terme si déjà dans cette langue]"
+                "{langueTraduction}": "[Traduction du terme dans la langue opposée, ou le terme si déjà dans cette langue)]"
             }}
         }},
         // ... autres termes
@@ -365,6 +364,7 @@ def generate_data(glossaire, generalInfo):
                 os.makedirs(pathDirectory + '/data', exist_ok=True)
             with open(pathDirectory + '/data/erreur.txt', 'w', encoding='utf-8') as f:
                 f.write(str(reponse))
-            print(f"Erreur de décodage JSON de la réponse complète : {e}. Réponse reçue:\n{reponse[:500]}...")
+            print(f"Erreur de décodage JSON de la réponse complète : {e}. Réponse reçue:\n{reponse}...")
         except Exception as e:
             print(f"Erreur lors du traitement de la réponse Gemini : {e}")
+    print("\nfin de la génération des exercices\n")

@@ -99,6 +99,7 @@ def ask_general_info():
     theme =         input("Thème                                   (optionnel): ").strip()
     cible =         input("Cible                                   (optionnel): ").strip()
     personnalite =  input("Personnalité                            (optionnel): ").strip()
+    langueInst =    input("Langue des questions                    (optionnel): ").strip()
     indicationSup = input("Indications supplémentaires pour l'IA   (optionnel): ").strip()
 
     info = {
@@ -107,7 +108,7 @@ def ask_general_info():
         "theme": theme if theme else None,
         "cible": cible if cible else None,
         "indicationSup": indicationSup if indicationSup else None,
-        "langueInst": None,
+        "langueInst": langueInst if langueInst else "Anglais" ,
     }
 
     print("\n--- Informations collectées ---")

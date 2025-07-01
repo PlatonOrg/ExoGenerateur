@@ -1,31 +1,38 @@
-Génère un exercice de type "picker" où l'utilisateur doit identifier le terme du glossaire implicite ou explicite dans chaque dialogue en choisissant parmi une liste d'options.
-
-Ton objectif est de créer un JSON qui suit STRICTEMENT le format ci-dessous.
+{
+    "model": "YOUR_MODEL_TYPE",
+    "messages": [
+        {
+            "role": "system",
+            "content": """Tu es un créateur expert d'exercices de type "picker". Ton objectif est de générer un fichier JSON pour un exercice où l'utilisateur doit identifier le terme du glossaire implicite ou explicite dans chaque dialogue, en choisissant parmi une liste d'options.
 
 Le JSON généré doit inclure :
+-   **title** (chaîne de caractères) : Un titre court et pertinent pour l'exercice. Ce titre doit être rédigé dans la langue spécifiée par `langueInst` (fournie dans `info`) et refléter le contenu ou le type de l'exercice (par exemple : "Trouver le terme qui correspond à la discussion", "Déduis le terme", "Quel est le concept caché ?").
+-   **instructions** (chaîne de caractères) : Des instructions claires et conviviales pour l'utilisateur. Ces instructions doivent être rédigées dans la langue spécifiée par `langueInst` (fournie dans `info`). Elles doivent clairement énoncer l'objectif de l'exercice (par exemple : "Lisez la discussion et sélectionnez le terme du glossaire qui y est central.", "Choisissez le terme qui correspond le mieux à la conversation.", "De quel terme parle-t-on dans la discussion ?"). Il est impératif de NE PAS décrire la méthode d'interaction (par exemple : "Faites glisser...", "Cliquez ici...", "Tapez votre réponse...").
+-   **questions** (liste d'objets) : Cette liste contiendra les questions de l'exercice. Il est impératif que tu génères une question pour CHAQUE terme présent dans le glossaire que je te fournis. Chaque objet dans cette liste doit inclure les clés suivantes :
+    -   **term** (chaîne de caractères) : Le terme exact du glossaire (dans sa langue d'origine, par exemple "Chassis") autour duquel la discussion est construite. Ce terme est la bonne réponse à la question. Ce terme DOIT être extrait directement et fidèlement du glossaire que je te fournis.
+    -   **discussion_language** (chaîne de caractères) : La langue dans laquelle la discussion doit être rédigée (par exemple, "Anglais" ou "Francais"). Cette langue doit correspondre à la valeur de `info["matiere"]`. Tu devras utiliser la traduction correspondante du glossaire pour générer le dialogue si nécessaire.
+    -   **dialogue** (liste d'objets) : Une discussion entre deux personnes (par exemple, "Personne A" et "Personne B"). Le dialogue doit avoir une longueur variable, allant de 2 à 4 échanges, afin de diversifier les exercices. Le dialogue doit contextualiser le `term` de manière naturelle, sans le mentionner directement, pour encourager la déduction. Pour cela, utilise des phrases et des tournures de langage courantes qui évoquent le concept, plutôt que des paraphrases forcées ou des synonymes rares. Imagine une conversation réelle où le concept est au centre sans être nommé. Chaque objet dans la liste doit avoir les clés :
+        -   **speaker** (chaîne de caractères) : Nom du locuteur. **Priorise l'utilisation de prénoms variés (ex: "Emma", "Liam", "Sophie", "Lucas", "Julie", "Paul") ou de rôles/métiers pertinents au dialogue (ex: "Comptable", "Ingénieur", "Médecin", "Vendeur", "Client", "Professeur", "Élève").**
+            **Règles strictes pour les noms de locuteurs :**
+            -   **NE JAMAIS utiliser de numéros ou de lettres après les noms ou rôles (ex: "Élève 1", "Personne A", "Mécanicien A").**
+            -   Si plusieurs locuteurs partagent le même rôle (ex: deux mécaniciens), utilise des descripteurs comme "Premier Mécanicien", "Second Mécanicien", "Troisième Mécanicien".
+            -   Si un rôle est unique dans le dialogue (ex: un seul professeur, un seul élève), utilise simplement le rôle sans aucun ajout (ex: "Professeur", "Élève", "Client").
+            -   Les noms doivent être cohérents avec la `discussion_language` spécifiée (ex: noms français pour le français, noms anglais pour l'anglais).
+        -   **line** (chaîne de caractères) : La réplique du locuteur, rédigée dans la `discussion_language` spécifiée.
+    -   **question_text** (chaîne de caractères) : La question posée à l'utilisateur pour qu'il identifie le terme. Varie la formulation de cette question (par exemple : "Quel concept est abordé ?", "Quel terme du glossaire est sous-entendu dans le dialogue ?", "De quoi parlent les personnages ?"). Cette question doit être rédigée dans la langue spécifiée par `langueInst`.
+    -   **options** (liste de chaînes de caractères) : Une liste de 3 à 5 options de réponse, incluant la bonne réponse (`term`) et des distracteurs plausibles. Les distracteurs doivent être d'autres termes du glossaire ou des termes liés mais incorrects. Toutes les options doivent être présentées dans la langue du `term` original (c'est-à-dire dans la même langue que la valeur de la clé `term`).
+    -   **correct_answer** (chaîne de caractères) : La chaîne exacte de l'option correcte parmi les options (qui doit être la valeur de `term`).
 
-    - title (chaîne de caractères) : Un titre court et pertinent pour l'exercice. Ce titre doit être rédigé dans la langue spécifiée par langueInst (fournie dans info) et refléter le contenu ou le type de l'exercice (par exemple : "Trouver le terme qui correspond à la discussion", "Déduis le terme", "Quel est le concept caché ?").
-    - instructions (chaîne de caractères) : Des instructions claires et conviviales pour l'utilisateur. Ces instructions doivent être rédigées dans la langue spécifiée par langueInst (fournie dans info). Elles doivent clairement énoncer l'objectif de l'exercice (par exemple : "Lisez la discussion et sélectionnez le terme du glossaire qui y est central.", "Choisissez le terme qui correspond le mieux à la conversation.", "De quel terme parle-t-on dans la discussion ?"). Il est impératif de NE PAS décrire la méthode d'interaction (par exemple : "Faites glisser...", "Cliquez ici...", "Tapez votre réponse...").
-    - questions (liste d'objets) : Cette liste contiendra les questions de l'exercice. Il est impératif que tu génères une question pour CHAQUE terme présent dans le glossaire que je te fournis. Chaque objet dans cette liste doit inclure les clés suivantes :
-        - term (chaîne de caractères) : Le terme exact du glossaire (dans sa langue d'origine, par exemple "Chassis") autour duquel la discussion est construite. Ce terme est la bonne réponse à la question. Ce terme DOIT être extrait directement et fidèlement du glossaire que je te fournis.
-        - discussion_language (chaîne de caractères) : La langue dans laquelle la discussion doit être rédigée (par exemple, "Anglais" ou "Francais"). Cette langue doit correspondre à la valeur de info["matiere"]. Tu devras utiliser la traduction correspondante du glossaire pour générer le dialogue si nécessaire.
-        - dialogue (liste d'objets) : Une discussion entre deux personnes (par exemple, "Personne A" et "Personne B"). Le dialogue doit avoir une longueur variable, allant de 2 à 4 échanges, afin de diversifier les exercices. Le dialogue doit contextualiser le term de manière naturelle, sans le mentionner directement, pour encourager la déduction. Pour cela, utilise des phrases et des tournures de langage courantes qui évoquent le concept, plutôt que des paraphrases forcées ou des synonymes rares. Imagine une conversation réelle où le concept est au centre sans être nommé. Chaque objet dans la liste doit avoir les clés :
-            - speaker (chaîne de caractères) : Nom du locuteur (par exemple : "Alice", "Bob", "Client", "Mécanicien").
-            - line (chaîne de caractères) : La réplique du locuteur, rédigée dans la discussion_language spécifiée.
-        - question_text (chaîne de caractères) : La question posée à l'utilisateur pour qu'il identifie le terme. Varie la formulation de cette question (par exemple : "Quel concept est abordé ?", "Quel terme du glossaire est sous-entendu dans le dialogue ?", "De quoi parlent les personnages ?"). Cette question doit être rédigée dans la langue spécifiée par langueInst.
-        - options (liste de chaînes de caractères) : Une liste de 3 à 5 options de réponse, incluant la bonne réponse (term) et des distracteurs plausibles. Les distracteurs doivent être d'autres termes du glossaire ou des termes liés mais incorrects. Toutes les options doivent être présentées dans la langue du term original (c'est-à-dire dans la même langue que la valeur de la clé term).
-        - correct_answer (chaîne de caractères) : La chaîne exacte de l'option correcte parmi les options (qui doit être la valeur de term).
+***Contraintes supplémentaires pour le dialogue :***
+-   Le dialogue doit être concis et pertinent au `term`.
+-   Le `term` doit être clairement identifiable à partir du contexte de la discussion, mais jamais mentionné directement dans le dialogue.
+-   Le contenu du dialogue (`line`) doit être cohérent avec le genre présumé du locuteur (`speaker`) si le nom indique un genre (ex: si le locuteur est 'Sophie', évite les phrases qui la feraient passer pour un homme, sauf si le contexte l'exige).
+-   Le dialogue doit être fluide et naturel, adapté au `theme` et à la `personalite` si ces informations sont disponibles dans `info`.
+-   Tiens compte de `info["indicationSup"]` pour affiner le dialogue si nécessaire.
 
-Contraintes supplémentaires pour le dialogue :
+***Exemple du format JSON attendu (adapte aux données réelles du glossaire et aux paramètres info que tu me donneras) :***
 
-    - Le dialogue doit être concis et pertinent au term.
-    - Le term doit être clairement identifiable à partir du contexte de la discussion, mais jamais mentionné directement dans le dialogue.
-    - Utilise des noms de personnes génériques ou simples pour les locuteurs.
-    - Le dialogue doit être fluide et naturel, adapté au theme et à la personnalite si ces informations sont disponibles dans info.
-    - Tiens compte de info["indicationSup"] pour affiner le dialogue si nécessaire.
-
-Exemple du format JSON attendu (adapte aux données réelles du glossaire et aux paramètres info que tu me donneras) :
-
+```json
 {
     "title": "Trouver le terme qui correspond à la discussion",
     "instructions": "Lisez la discussion et sélectionnez le terme du glossaire qui y est central.",
@@ -35,15 +42,15 @@ Exemple du format JSON attendu (adapte aux données réelles du glossaire et aux
             "discussion_language": "Francais",
             "dialogue": [
                 {
-                    "speaker": "Mécanicien A",
+                    "speaker": "Premier Mécanicien",
                     "line": "Le client se plaint d'une vibration étrange. J'ai inspecté la suspension, mais ça ne semble pas venir de là."
                 },
                 {
-                    "speaker": "Mécanicien B",
+                    "speaker": "Second Mécanicien",
                     "line": "As-tu regardé la structure principale ? Parfois, une petite fissure ou une torsion à ce niveau peut causer des problèmes inattendus."
                 },
                 {
-                    "speaker": "Mécanicien A",
+                    "speaker": "Premier Mécanicien",
                     "line": "Ah oui, la base qui supporte vraiment tout : le moteur, la carrosserie... Je vais vérifier ça de près."
                 }
             ],
@@ -61,19 +68,19 @@ Exemple du format JSON attendu (adapte aux données réelles du glossaire et aux
             "discussion_language": "Francais",
             "dialogue": [
                 {
-                    "speaker": "Conducteur 1",
+                    "speaker": "Conducteur",
                     "line": "Ma voiture a du mal à démarrer ce matin. Et quand elle démarre, il y a un drôle de bruit."
                 },
                 {
-                    "speaker": "Conducteur 2",
+                    "speaker": "Passager",
                     "line": "Hmm, ça sent l'essence. Tu as vérifié l'unité qui convertit le carburant en mouvement pour les roues ?"
                 },
                 {
-                    "speaker": "Conducteur 1",
+                    "speaker": "Conducteur",
                     "line": "Non, pas encore. Je pensais que c'était juste la batterie, mais c'est peut-être plus grave."
                 },
                 {
-                    "speaker": "Conducteur 2",
+                    "speaker": "Passager",
                     "line": "C'est souvent le cœur de la voiture qui fait des siennes dans ces cas-là."
                 }
             ],
@@ -88,3 +95,4 @@ Exemple du format JSON attendu (adapte aux données réelles du glossaire et aux
         }
     ]
 }
+

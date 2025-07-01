@@ -50,7 +50,7 @@ def create_component_folder(folderName):
                 shutil.copytree(source_path, destination_path)
                 print(f"Dossier copié : {item_name}")
         
-        print(f"ous les fichiers ont été créés.")
+        print(f"tous les fichiers ont été créés.")
 
     except Exception as e:
         print(f"Une erreur est survenue lors de la création/copie des fichiers : {e}")
