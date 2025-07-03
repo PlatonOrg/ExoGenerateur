@@ -1,0 +1,44 @@
+Génère un exercice d'association où l'utilisateur doit relier chaque terme à son synonyme courant, en utilisant les informations du glossaire fournies dans le corps de ma requête. Le synonyme sélectionné doit être **courant et fréquemment utilisé** dans la vie quotidienne, afin de faciliter l'apprentissage pratique de la langue. Il est impératif d'éviter les synonymes obscurs, techniques ou rarement employés.
+
+**Si un terme du glossaire n'a pas de synonyme courant et directement utilisable dans le langage quotidien, ou si le seul synonyme disponible est le terme lui-même ou une paraphrase complexe, ce terme doit être omis de l'exercice pour garantir la pertinence de l'apprentissage.** Seuls les termes avec des synonymes clairs et courants doivent être inclus.
+
+Ton objectif est de créer un JSON qui suit STRICTEMENT le format ci-dessous.
+
+Le JSON généré doit inclure :
+
+-   **title** (chaîne de caractères) : Un titre court et pertinent pour l'exercice. Ce titre doit être rédigé dans la langue spécifiée par `langueInst` et refléter le contenu ou le type de l'exercice (par exemple : "Vocabulaire : Synonymes", "Associer les Synonymes Clés"). **Il est impératif que ce titre NE MENTIONNE PAS les langues spécifiques de l'exercice (par exemple, pas de "Allemand-Français" ou "Anglais").**
+
+-   **instructions** (chaîne de caractères) : Des instructions claires et conviviales pour l'utilisateur qui fera l'exercice. Ces instructions doivent être rédigées dans la langue spécifiée par `langueInst`. Elles doivent clairement énoncer l'objectif de l'exercice (par exemple : "Associez chaque terme à son synonyme courant.", "Trouvez le synonyme le plus approprié pour chaque mot."). Il est impératif de NE PAS décrire la méthode d'interaction (par exemple : "Faites glisser...", "Cliquez ici...", "Tapez votre réponse...").
+
+-   **questions** (liste d'objets) : Cette liste contiendra les éléments que l'utilisateur devra associer. Tu dois générer un objet pour CHAQUE terme présent dans le glossaire que je te fournis, **sous réserve qu'il réponde aux critères de synonyme courant mentionnés ci-dessus**. Chaque objet dans cette liste doit avoir les clés suivantes :
+
+    -   **term** (chaîne de caractères) : Le terme exact du glossaire (dans la langue du terme, généralement le terme principal du glossaire).
+
+    -   **match** (chaîne de caractères) : Le synonyme **courant et directement utilisable au quotidien** du `term` correspondant. Ces valeurs DOIVENT être générées pour être des synonymes précis, simples et pertinents pour une utilisation courante.
+
+    -   **correct_answer** (chaîne de caractères) : La chaîne exacte du `term` (valeur identique à la clé `term`).
+
+**Exemple du format JSON attendu (adapte les termes et synonymes aux données réelles que je te donne, en utilisant le champ `term` et en générant un synonyme courant) :**
+
+```json
+{
+    "title": "Vocabulaire : Synonymes",
+    "instructions": "Associez chaque terme à son synonyme courant.",
+    "questions": [
+        {
+            "term": "vorstellung",
+            "match": "Einführung",
+            "correct_answer": "vorstellung"
+        },
+        {
+            "term": "begrüßung",
+            "match": "Gruß",
+            "correct_answer": "begrüßung"
+        },
+        {
+            "term": "beruf",
+            "match": "Tätigkeit",
+            "correct_answer": "beruf"
+        }
+    ]
+}

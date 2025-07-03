@@ -1,8 +1,8 @@
 Dossier qui regroupe les modèles d'exercices
 
 association :
-    permet d'associer un terme du glossaire avec sa définition ou sa traduction.
-        - match : associer le terme avec sa traduction/définition : un seul choix
+    permet d'associer un terme du glossaire avec sa définition, sa traduction, ou un synonyme.
+        - match : associer le terme avec sa traduction/définition/synonyme : un seul choix
         - picker : associer le terme avec sa traduction/définition : plusieurs choix (1 choix correct, plusieurs incorrecte)
 
 dialogue :
@@ -16,4 +16,4 @@ phrase_ordre :
 
 phrase_emplacement :
     - Une phrase avec la définition d'un mot, il faut retrouver le mot dans la phrase
-        
+    

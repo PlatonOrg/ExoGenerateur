@@ -1,0 +1,135 @@
+## Prompt : Génération d'Exercice "Identification du Type d'Erreur" (Usage du Terme)
+
+Génère un exercice où l'utilisateur doit identifier le type d'erreur présente dans une phrase. Chaque phrase contiendra un terme issu du glossaire que je te fournis, mais sera volontairement erronée dans son application grammaticale, sa structure ou son orthographe.
+
+Ton objectif est de créer un JSON qui suit **STRICTEMENT** le format ci-dessous.
+
+Le JSON généré doit inclure :
+
+* **`title`** (chaîne de caractères) :
+    * Un titre court et pertinent pour l'exercice.
+    * Ce titre doit être rédigé dans la langue spécifiée par `langueInst` et refléter le contenu ou le type d'exercice (par exemple : "Trouve l'Erreur : Grammaire Anglaise", "Détecte le Faux : Usage des Termes").
+
+* **`instructions`** (chaîne de caractères) :
+    * Des instructions claires et conviviales pour l'utilisateur.
+    * Ces instructions doivent être rédigées dans la langue spécifiée par `langueInst` et clairement énoncer l'objectif de l'exercice (par exemple : "Lisez chaque phrase. Elle contient une erreur liée à un terme du glossaire. Identifiez le type d'erreur parmi les options proposées.", "Pour chaque énoncé, la phrase est incorrecte. Choisissez le type d'erreur qui la caractérise."). Il est impératif de **NE PAS** décrire la méthode d'interaction (par exemple : "Cochez la case...", "Cliquez sur...").
+
+* **`error_types_options`** (liste de chaînes de caractères) :
+    * Une liste des types d'erreurs possibles que l'utilisateur pourra choisir.
+    * Ces types doivent être rédigés dans la langue spécifiée par `langueInst`.
+    * **Tu dois inclure les options suivantes, et tu peux en ajouter d'autres si cela enrichit l'exercice de manière pertinente pour le glossaire fourni, mais les types énumérés sont obligatoires. Le type "Terme incorrect" est exclu :**
+        * `"Orthographe"` / `"Spelling"`
+        * `"Pluriel/Singulier"` / `"Plural/Singular"`
+        * `"Concordance sujet-verbe"` / `"Subject-verb agreement"` (si pertinent pour le glossaire/langue)
+        * `"Genre"` / `"Gender"` (si pertinent pour le glossaire/langue)
+        * `"Placement dans la phrase"` / `"Word order"` (pour les erreurs de syntaxe ou d'ordre des mots)
+        * `"Temps/Mode verbal"` / `"Verb tense/mood"` (si pertinent)
+        * `"Préposition"` / `"Preposition"` (si pertinent)
+
+* **`questions`** (liste d'objets) :
+    * Cette liste contiendra les questions individuelles de l'exercice.
+    * Pour **CHAQUE `term`** du `glossaire` que je te fournis, tu dois générer une ou plusieurs questions.
+    * **Contraintes de quantité :** Génère **au moins une question par terme** du glossaire. Tu peux générer jusqu'à **3 questions par terme** si cela permet d'illustrer des types d'erreurs variés et pertinents.
+    * Chaque objet dans cette liste doit avoir les clés suivantes :
+        * **`term`** (chaîne de caractères) : Le terme exact du glossaire qui est ciblé par l'erreur dans la phrase. Ce terme ne sera **pas** mis en gras dans `incorrect_sentence`.
+        * **`incorrect_sentence`** (chaîne de caractères) : La phrase qui contient une erreur.
+            * Cette phrase doit être formulée dans la langue du `term` (ou la langue cible si l'exercice porte sur l'usage dans cette langue).
+            * **Le terme du glossaire concerné ne doit PAS être mis en gras.**
+            * L'erreur doit être **clairement identifiable et unique** pour éviter toute ambiguïté sur le type d'erreur, et doit porter sur la forme ou la structure du terme ou de la phrase qui l'entoure.
+        * **`correct_sentence`** (chaîne de caractères) : La version corrigée de la phrase.
+            * Cette phrase doit être **correcte et naturelle**.
+        * **`correct_error_type`** (chaîne de caractères) : Le type d'erreur correct pour la `incorrect_sentence`, choisi parmi les options de `error_types_options`.
+
+---
+
+### Informations Supplémentaires :
+
+Ces informations devront être fournies par l'utilisateur du prompt :
+
+* **`langueInst`** (chaîne de caractères) : Langue des instructions, du titre et des options de type d'erreur. Ex: "Français", "Anglais".
+* **`langueCible`** (chaîne de caractères, optionnel) : Langue spécifique dans laquelle les phrases de l'exercice doivent être formulées si elle diffère de la langue d'origine des `term`. Si non spécifié, utilise la langue du `term`. Ex: "Anglais", "Francais".
+* **`glossaire`** (liste d'objets JSON) : Le glossaire à utiliser pour générer l'exercice. Chaque objet doit inclure au moins un `term` et sa `definition`, et optionnellement des `translation`.
+
+```json
+[
+  {
+    "term": "probability",
+    "definition": "The chance or likelihood of an event occurring. It's a numerical measure of uncertainty, ranging from 0 (impossible) to 1 (certain).",
+    "translation": {
+      "Anglais": "probability",
+      "Francais": "probabilité"
+    }
+  },
+  {
+    "term": "event",
+    "definition": "An outcome or set of outcomes of a random phenomenon.",
+    "translation": {
+      "Anglais": "event",
+      "Francais": "événement"
+    }
+  },
+  {
+    "term": "random variable",
+    "definition": "A variable whose value is a numerical outcome of a random phenomenon.",
+    "translation": {
+      "Anglais": "random variable",
+      "Francais": "variable aléatoire"
+    }
+  },
+  {
+    "term": "sample space",
+    "definition": "The set of all possible outcomes of a random phenomenon.",
+    "translation": {
+      "Anglais": "sample space",
+      "Francais": "espace échantillonnal"
+    }
+  }
+]
+
+Exemple de Résultat JSON Attendu :
+
+JSON
+
+{
+  "title": "Trouve l'Erreur : Usage des Termes de Probabilité",
+  "instructions": "Lisez chaque phrase. Elle contient une erreur liée à un terme du glossaire. Identifiez le type d'erreur parmi les options proposées.",
+  "error_types_options": [
+    "Orthographe",
+    "Pluriel/Singulier",
+    "Placement dans la phrase",
+    "Concordance sujet-verbe",
+    "Préposition"
+  ],
+  "questions": [
+    {
+      "term": "event",
+      "incorrect_sentence": "The events was very unlikely to happen.",
+      "correct_sentence": "The event was very unlikely to happen.",
+      "correct_error_type": "Pluriel/Singulier"
+    },
+    {
+      "term": "probability",
+      "incorrect_sentence": "We calculated the probabilty of success.",
+      "correct_sentence": "We calculated the probability of success.",
+      "correct_error_type": "Orthographe"
+    },
+    {
+      "term": "random variable",
+      "incorrect_sentence": "A variable random is numerical.",
+      "correct_sentence": "A random variable is numerical.",
+      "correct_error_type": "Placement dans la phrase"
+    },
+    {
+      "term": "sample space",
+      "incorrect_sentence": "The sample space describe the set of all outcomes.",
+      "correct_sentence": "The sample space describes the set of all outcomes.",
+      "correct_error_type": "Concordance sujet-verbe"
+    },
+    {
+      "term": "random variable",
+      "incorrect_sentence": "He talks about random variable from his lecture.",
+      "correct_sentence": "He talks about the random variable from his lecture.",
+      "correct_error_type": "Préposition"
+    }
+  ]
+}
