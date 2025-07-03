@@ -213,8 +213,8 @@ def generalPrompt(glossaire, generalInfo):
     Ce prompt est conçu pour être complété dynamiquement avec les instructions spécifiques
     de chaque exercice par la fonction generate_data.
     """
-    langue = generalInfo.get('langueInst', 'Français')
-    matiere = generalInfo.get('matiere', 'None')
+    langue = generalInfo.get('langueInst', generalInfo['matiere'])
+    matiere = generalInfo['matiere']
     personnalite = generalInfo.get('personnalite', 'None')
     theme = generalInfo.get('theme', 'None')
     cible = generalInfo.get('cible', 'None')
@@ -335,7 +335,7 @@ def generate_data(glossaire, generalInfo):
                         try:
                             with open(exerciceName, 'w', encoding='utf-8') as f:
                                 json.dump(exercise_data, f, indent=4, ensure_ascii=False)
-                            print(f"Exercice '{fileNames[idx]}.json' généré")
+                            print(f"Exercice '{fileNames[idx]:<40}.json' généré")
 
                             if savePrompt > 1:
                                 outputNameData = f"{pathDirectory}/data/prompt_{fileNames[idx]}.txt"
