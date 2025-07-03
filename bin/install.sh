@@ -12,9 +12,11 @@ Purple=$'\e[0;35m' # Purple
 Cyan=$'\e[0;36m'   # Cyan
 
 # --- Configuration Variables ---
-VENV_DIR="venv"           # Name of the virtual environment directory
+VENV_DIR="venv"             # Name of the virtual environment directory
 REQUIREMENTS_FILE="requirements.txt" # Name of the dependencies file
-ENV_FILE=".env"           # Name of the file to store the API key
+ENV_FILE=".env"             # Name of the file to store the API key
+OUTPUT_DIR="output"         # Name of the output directory
+LOCAL_FILE_DIR="local_file" # Name of the directory to store local file
 
 # --- Utility Functions ---
 
@@ -108,7 +110,30 @@ if ! "$VENV_PIP" install -r "$REQUIREMENTS_FILE"; then
 fi
 echo "$Green Dependencies installed successfully.$Color_Off"
 
-# --- Requesting and Storing Gemini API Key ---
+---
+### create local directory
+```bash
+echo "$Cyan"
+echo "Creating project directories '$OUTPUT_DIR' and '$LOCAL_FILE_DIR'..."
+echo "$Color_Off"
+
+# Create output directory if it doesn't exist
+if [ ! -d "$OUTPUT_DIR" ]; then
+    mkdir -p "$OUTPUT_DIR"
+    echo "$Green Directory '$OUTPUT_DIR' created.$Color_Off"
+else
+    echo "$Yellow Directory '$OUTPUT_DIR' already exists. Skipping creation.$Color_Off"
+fi
+
+# Create local_file directory if it doesn't exist
+if [ ! -d "$LOCAL_FILE_DIR" ]; then
+    mkdir -p "$LOCAL_FILE_DIR"
+    echo "$Green Directory '$LOCAL_FILE_DIR' created.$Color_Off"
+else
+    echo "$Yellow Directory '$LOCAL_FILE_DIR' already exists. Skipping creation.$Color_Off"
+fi
+
+--- Requesting and Storing Gemini API Key ---
 
 echo "$Purple"
 echo -e "\n--- Gemini API Key Configuration ---$Color_Off"
@@ -116,31 +141,31 @@ echo "To get your Gemini API key, visit: https://ai.google.dev/aistudio"
 read -p "Please enter your Gemini API key (leave empty to configure later): " API_KEY
 
 if [ -z "$API_KEY" ]; then
-    echo "$Yellow Warning: No API key entered. You will need to manually configure it in '$ENV_FILE' before using the API.$Color_Off"
+echo "$Yellow Warning: No API key entered. You will need to manually configure it in '$ENV_FILE' before using the API.$Color_Off"
 else
-    # Create or update the .env file
-    echo "GOOGLE_API_KEY=\"$API_KEY\"" > "$ENV_FILE"
-    echo "$Green Gemini API key stored in '$ENV_FILE'.$Color_Off"
+# Create or update the .env file
+echo "GOOGLE_API_KEY="$API_KEY"" > "$ENV_FILE"
+echo "$Green Gemini API key stored in '$ENV_FILE'.$Color_Off"
 fi
 
-# --- Updating .gitignore ---
+--- Updating .gitignore ---
 
 echo "$Cyan"
 echo "Updating .gitignore file...$Color_Off"
 GITIGNORE_FILE=".gitignore"
 
 if [ ! -f "$GITIGNORE_FILE" ]; then
-    echo "$Cyan Creating '$GITIGNORE_FILE' file...$Color_Off"
-    echo -e "# Python\n__pycache__/\n*.pyc\n*.pyo\n*.pyd\n.Python\n$VENV_DIR/\nenv/\n$ENV_FILE\n\n# IDE files\n.idea/\n.vscode/\n\n# OS generated files\n.DS_Store\nThumbs.db" > "$GITIGNORE_FILE"
-    echo "$Green '$GITIGNORE_FILE' created with standard exclusions including '$ENV_FILE' and '$VENV_DIR/'. $Color_Off"
+echo "$Cyan Creating '$GITIGNORE\_FILE' file...$Color\_Off"
+echo -e "\# Python\\n\_\_pycache\_\_/\\n\*.pyc\\n\*.pyo\\n\*.pyd\\n.Python\\n$VENV\_DIR/\\nenv/\\n$ENV_FILE\n\n# IDE files\n.idea/\n.vscode/\n\n# OS generated files\n.DS_Store\nThumbs.db" > "$GITIGNORE_FILE"
+echo "$Green '$GITIGNORE_FILE' created with standard exclusions including '$ENV_FILE' and '$VENV_DIR/'. $Color_Off"
 elif ! grep -q "$ENV_FILE" "$GITIGNORE_FILE" || ! grep -q "$VENV_DIR/" "$GITIGNORE_FILE"; then
-    echo "$Cyan Adding '$ENV_FILE' and '$VENV_DIR/' to your existing .gitignore...$Color_Off"
-    # Add only if not already present
-    ! grep -q "$ENV_FILE" "$GITIGNORE_FILE" && echo "$ENV_FILE" >> "$GITIGNORE_FILE"
-    ! grep -q "$VENV_DIR/" "$GITIGNORE_FILE" && echo "$VENV_DIR/" >> "$GITIGNORE_FILE"
-    echo "$Green '$ENV_FILE' and '$VENV_DIR/' added to .gitignore.$Color_Off"
+echo "$Cyan Adding '$ENV_FILE' and '$VENV_DIR/' to your existing .gitignore...$Color_Off"
+# Add only if not already present
+! grep -q "$ENV_FILE" "$GITIGNORE_FILE" && echo "$ENV_FILE" >> "$GITIGNORE_FILE"
+! grep -q "$VENV_DIR/" "$GITIGNORE_FILE" && echo "$VENV_DIR/" >> "$GITIGNORE_FILE"
+echo "$Green '$ENV_FILE' and '$VENV_DIR/' added to .gitignore.$Color_Off"
 else
-    echo "$Green '$ENV_FILE' and '$VENV_DIR/' are already listed in .gitignore. Perfect! $Color_Off"
+echo "$Green '$ENV_FILE' and '$VENV_DIR/' are already listed in .gitignore. Perfect! $Color_Off"
 fi
 
 echo -e "$Green\n--- Installation and configuration complete! ---$Color_Off"
