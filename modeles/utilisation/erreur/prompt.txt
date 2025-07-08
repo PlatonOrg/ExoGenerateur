@@ -1,6 +1,6 @@
-## Prompt : Génération d'Exercice "Identification du Type d'Erreur" (Usage du Terme)
+## Prompt : Génération d'Exercice "Identification du Type d'Erreur" (Usage du Terme - Version FINALE et VALIDÉE)
 
-Génère un exercice où l'utilisateur doit identifier le type d'erreur présente dans une phrase. Chaque phrase contiendra un terme issu du glossaire que je te fournis, mais sera volontairement erronée dans son application grammaticale, sa structure ou son orthographe.
+Génère un exercice où l'utilisateur doit identifier le ou les types d'erreurs présentes dans une phrase. Chaque phrase contiendra un terme issu du glossaire que je te fournis. La phrase sera volontairement erronée dans son application grammaticale, sa structure, son orthographe, **ou bien elle pourra être correcte**.
 
 Ton objectif est de créer un JSON qui suit **STRICTEMENT** le format ci-dessous.
 
@@ -12,7 +12,7 @@ Le JSON généré doit inclure :
 
 * **`instructions`** (chaîne de caractères) :
     * Des instructions claires et conviviales pour l'utilisateur.
-    * Ces instructions doivent être rédigées dans la langue spécifiée par `langueInst` et clairement énoncer l'objectif de l'exercice (par exemple : "Lisez chaque phrase. Elle contient une erreur liée à un terme du glossaire. Identifiez le type d'erreur parmi les options proposées.", "Pour chaque énoncé, la phrase est incorrecte. Choisissez le type d'erreur qui la caractérise."). Il est impératif de **NE PAS** décrire la méthode d'interaction (par exemple : "Cochez la case...", "Cliquez sur...").
+    * Ces instructions doivent être rédigées dans la langue spécifiée par `langueInst` et clairement énoncer l'objectif de l'exercice (par exemple : "Lisez chaque phrase. Elle contient une erreur liée à un terme du glossaire, ou elle est correcte. Identifiez le type ou les types d'erreur parmi les options proposées, ou choisissez 'Correct'.", "Pour chaque énoncé, la phrase peut être incorrecte ou parfaite. Choisissez le ou les types d'erreurs ou indiquez si elle est correcte."). Il est impératif de **NE PAS** décrire la méthode d'interaction (par exemple : "Cochez la case...", "Cliquez sur...").
 
 * **`error_types_options`** (liste de chaînes de caractères) :
     * Une liste des types d'erreurs possibles que l'utilisateur pourra choisir.
@@ -25,20 +25,33 @@ Le JSON généré doit inclure :
         * `"Placement dans la phrase"` / `"Word order"` (pour les erreurs de syntaxe ou d'ordre des mots)
         * `"Temps/Mode verbal"` / `"Verb tense/mood"` (si pertinent)
         * `"Préposition"` / `"Preposition"` (si pertinent)
+        * **`"Correct"`** (à inclure obligatoirement pour indiquer l'absence d'erreur)
 
 * **`questions`** (liste d'objets) :
     * Cette liste contiendra les questions individuelles de l'exercice.
     * Pour **CHAQUE `term`** du `glossaire` que je te fournis, tu dois générer une ou plusieurs questions.
     * **Contraintes de quantité :** Génère **au moins une question par terme** du glossaire. Tu peux générer jusqu'à **3 questions par terme** si cela permet d'illustrer des types d'erreurs variés et pertinents.
     * Chaque objet dans cette liste doit avoir les clés suivantes :
-        * **`term`** (chaîne de caractères) : Le terme exact du glossaire qui est ciblé par l'erreur dans la phrase. Ce terme ne sera **pas** mis en gras dans `incorrect_sentence`.
-        * **`incorrect_sentence`** (chaîne de caractères) : La phrase qui contient une erreur.
+        * **`term`** (chaîne de caractères) : Le terme exact du glossaire qui est ciblé par l'erreur dans la phrase (ou qui est correctement utilisé si le type est "Correct"). Ce terme ne sera **pas** mis en gras dans `incorrect_sentence`.
+        * **`incorrect_sentence`** (chaîne de caractères) : La phrase qui contient une ou plusieurs erreurs, **directement liées à l'utilisation, la forme ou la structure du `term` lui-même**, ou qui est correcte.
             * Cette phrase doit être formulée dans la langue du `term` (ou la langue cible si l'exercice porte sur l'usage dans cette langue).
             * **Le terme du glossaire concerné ne doit PAS être mis en gras.**
-            * L'erreur doit être **clairement identifiable et unique** pour éviter toute ambiguïté sur le type d'erreur, et doit porter sur la forme ou la structure du terme ou de la phrase qui l'entoure.
+            * Si `correct_error_type` contient "Correct", alors cette phrase DOIT être grammaticalement et sémantiquement irréprochable.
+            * Si `correct_error_type` ne contient PAS "Correct", l'erreur ou les erreurs doivent être **clairement identifiables et uniques** pour éviter toute ambiguïté sur le type d'erreur. **Ces erreurs doivent être cumulées sur le `term` ou les mots qui l'entourent directement, pas sur d'autres mots de la phrase**.
+            * **Précision pour les types d'erreurs :**
+                * `"Temps/Mode verbal"` / `"Verb tense/mood"` : Ce type d'erreur ne DOIT être utilisé que si le `term` lui-même est un verbe (ou une expression verbale principale).
+                * `"Concordance sujet-verbe"` / `"Subject-verb agreement"` : Ce type d'erreur ne DOIT être utilisé que si le `term` est le sujet grammatical dont l'accord avec le verbe est incorrect.
+                * `"Préposition"` / `"Preposition"` : L'erreur de préposition doit concerner une préposition directement associée à la construction du `term` ou à son rôle dans la phrase.
         * **`correct_sentence`** (chaîne de caractères) : La version corrigée de la phrase.
-            * Cette phrase doit être **correcte et naturelle**.
-        * **`correct_error_type`** (chaîne de caractères) : Le type d'erreur correct pour la `incorrect_sentence`, choisi parmi les options de `error_types_options`.
+            * Si `correct_error_type` contient "Correct", cette phrase DOIT être identique à `incorrect_sentence`.
+            * Sinon, cette phrase doit être **correcte et naturelle**.
+        * **`correct_error_type`** (liste de chaînes de caractères) : Le type ou les types d'erreur(s) correct(s) pour la `incorrect_sentence`.
+            * **Chaque élément de cette liste DOIT OBLIGATOIREMENT être choisi parmi les valeurs présentes dans la liste `error_types_options`.**
+            * Si la phrase est correcte, cette liste DOIT contenir uniquement `"Correct"`.
+            * Si la phrase a plusieurs erreurs sur le terme ciblé, cette liste DOIT contenir tous les types d'erreurs applicables.
+        * **`explanation`** (chaîne de caractères) : Une courte explication de l'erreur ou des erreurs.
+            * Cette explication doit être rédigée dans la même langue que `incorrect_sentence`.
+            * Elle doit être une **phrase unique, concise et claire**, décrivant la nature de la ou des erreurs (ou indiquant l'absence d'erreur si `correct_error_type` est "Correct").
 
 ---
 
@@ -47,7 +60,7 @@ Le JSON généré doit inclure :
 Ces informations devront être fournies par l'utilisateur du prompt :
 
 * **`langueInst`** (chaîne de caractères) : Langue des instructions, du titre et des options de type d'erreur. Ex: "Français", "Anglais".
-* **`langueCible`** (chaîne de caractères, optionnel) : Langue spécifique dans laquelle les phrases de l'exercice doivent être formulées si elle diffère de la langue d'origine des `term`. Si non spécifié, utilise la langue du `term`. Ex: "Anglais", "Francais".
+* **`langueCible`** (chaîne de caractères, optionnel) : Langue spécifique dans laquelle les phrases de l'exercice doivent être formulée si elle diffère de la langue d'origine des `term`. Si non spécifié, utilise la langue du `term`. Ex: "Anglais", "Francais".
 * **`glossaire`** (liste d'objets JSON) : Le glossaire à utiliser pour générer l'exercice. Chaque objet doit inclure au moins un `term` et sa `definition`, et optionnellement des `translation`.
 
 ```json
@@ -88,48 +101,67 @@ Ces informations devront être fournies par l'utilisateur du prompt :
 
 Exemple de Résultat JSON Attendu :
 
-JSON
-
 {
   "title": "Trouve l'Erreur : Usage des Termes de Probabilité",
-  "instructions": "Lisez chaque phrase. Elle contient une erreur liée à un terme du glossaire. Identifiez le type d'erreur parmi les options proposées.",
+  "instructions": "Lisez chaque phrase. Elle contient une erreur liée à un terme du glossaire, ou elle est correcte. Identifiez le type ou les types d'erreur parmi les options proposées, ou choisissez 'Correct'.",
   "error_types_options": [
     "Orthographe",
     "Pluriel/Singulier",
     "Placement dans la phrase",
     "Concordance sujet-verbe",
-    "Préposition"
+    "Préposition",
+    "Temps/Mode verbal",
+    "Correct"
   ],
   "questions": [
     {
       "term": "event",
-      "incorrect_sentence": "The events was very unlikely to happen.",
-      "correct_sentence": "The event was very unlikely to happen.",
-      "correct_error_type": "Pluriel/Singulier"
+      "incorrect_sentence": "The events was very unlikely.",
+      "correct_sentence": "The event was very unlikely.",
+      "correct_error_type": ["Pluriel/Singulier", "Concordance sujet-verbe"],
+      "explanation": "Le terme 'events' devrait être au singulier et le verbe 'was' devrait s'accorder avec un sujet singulier ('event')."
     },
     {
       "term": "probability",
-      "incorrect_sentence": "We calculated the probabilty of success.",
+      "incorrect_sentence": "We calculated the probabilty of successes.",
       "correct_sentence": "We calculated the probability of success.",
-      "correct_error_type": "Orthographe"
+      "correct_error_type": ["Orthographe", "Pluriel/Singulier"],
+      "explanation": "Le mot 'probabilty' est mal orthographié et 'successes' devrait être singulier."
     },
     {
       "term": "random variable",
       "incorrect_sentence": "A variable random is numerical.",
       "correct_sentence": "A random variable is numerical.",
-      "correct_error_type": "Placement dans la phrase"
+      "correct_error_type": ["Placement dans la phrase"],
+      "explanation": "Les adjectifs 'random' et 'variable' sont intervertis dans le terme composé 'random variable'."
     },
     {
       "term": "sample space",
-      "incorrect_sentence": "The sample space describe the set of all outcomes.",
+      "incorrect_sentence": "The sample spaces describe the set of all outcomes.",
       "correct_sentence": "The sample space describes the set of all outcomes.",
-      "correct_error_type": "Concordance sujet-verbe"
+      "correct_error_type": ["Pluriel/Singulier", "Concordance sujet-verbe"],
+      "explanation": "Le terme 'sample spaces' devrait être singulier et le verbe 'describe' devrait s'accorder avec un sujet singulier ('sample space')."
     },
     {
       "term": "random variable",
-      "incorrect_sentence": "He talks about random variable from his lecture.",
+      "incorrect_sentence": "He talks about the random variable from his lecture.",
       "correct_sentence": "He talks about the random variable from his lecture.",
-      "correct_error_type": "Préposition"
+      "correct_error_type": ["Correct"],
+      "explanation": "La phrase est grammaticalement correcte et l'utilisation du terme est appropriée."
+    },
+    {
+      "term": "event",
+      "incorrect_sentence": "The even for the project was tomorrow.",
+      "correct_sentence": "The event for the project was tomorrow.",
+      "correct_error_type": ["Orthographe"],
+      "explanation": "Le mot 'even' est une faute d'orthographe pour 'event'."
+    },
+    {
+      "term": "probability",
+      "incorrect_sentence": "What is the probabilty of this event to happening?",
+      "correct_sentence": "What is the probability of this event happening?",
+      "correct_error_type": ["Orthographe", "Préposition"],
+      "explanation": "Le mot 'probabilty' est mal orthographié et la construction 'to happening' est incorrecte après 'probability of', qui requiert un gérondif."
     }
   ]
 }
