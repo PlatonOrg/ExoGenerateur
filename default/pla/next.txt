@@ -1,0 +1,248 @@
+from random import shuffle, randint
+import json
+
+
+############ LOAD VARIABLE
+
+stat = load("stat",{})
+
+indexGroup = load("indexGroup",0)
+indexUnique = load("indexUnique",0)
+
+size = 5
+originalGlossaire = []
+
+
+if indexGroup > 3:
+    indexGroup = 0
+
+if indexGroup == 0:
+  originalGlossaire = json.load(open('includes/glossaire.json','r'))
+
+elif indexGroup == 1:
+  groupe = json.load(open('includes/definition.json','r'))
+
+elif indexGroup == 2:
+  groupe = json.load(open('includes/traduction.json','r'))
+
+elif indexGroup == 3:
+  groupe = json.load(open('includes/utilisation.json','r'))
+
+
+
+# met à jour les données de stat
+previousId = getPreviousExerciseId()
+if previousId :
+  exoData = getExerciseVariable(previousId,"stat")
+  previousGroup = 3 if indexGroup == 0 else indexGroup - 1
+
+  if exoData is not {}:
+    for key in exoData.keys():
+      if previousGroup == 0 :
+        element = stat.get(key,{})
+        if element == {} :
+          stat[key] = {
+            "definition": [exoData[key],1], 
+            "traduction":[0,0],
+            "utilisation":[0,0]
+          }
+        else :
+          stat[key]["definition"] = [stat[key]["definition"][0] + exoData[key],stat[key]["definition"][1] + 1]
+
+      elif previousGroup == 1:
+        element = stat.get(key,{})
+        if element == {} :
+          stat[key] = {
+            "definition": [0,0], 
+            "traduction":[exoData[key],1],
+            "utilisation":[0,0]
+          }
+        else :
+          stat[key]["traduction"] = [stat[key]["traduction"][0] + exoData[key],stat[key]["traduction"][1] + 1]
+
+      else :
+        element = stat.get(key,{})
+        if element == {} :
+          stat[key] = {
+            "definition": [0,0],
+            "traduction":[0,0],
+            "utilisation":[exoData[key],1]
+          }
+        else :
+          stat[key]["utilisation"] = [stat[key]["utilisation"][0] + exoData[key],stat[key]["utilisation"][1] + 1]
+
+############ FUNCTION
+
+
+def next_data_save(groupe,strIndexGroup, glossaireExo, size):
+  """
+  derniere chance pour sauver l'activitée, charge l'exo 0 du groupe qui doit avoir tout les termes
+  """
+  # prends un exercice 
+  ExoNumber = 0
+
+  # pour le ExoNumber
+  exerciceData = {
+      "title" : groupe[ExoNumber]['exercice']['title'],
+      "instructions" : groupe[ExoNumber]['exercice']['instructions'],
+      "questions":[],
+  }
+  count = 0 # arrête si trop de terme
+  for question in groupe[ExoNumber]['exercice']['questions']:
+      if question['term'] in glossaireExo:
+          exerciceData["questions"].append(question)
+          count += 1
+      if size == count:
+          break
+
+  return ExoNumber,exerciceData
+
+def next_data(groupe,strIndexGroup, glossaireExo, size):
+  """
+  Choisis aléatoirement un exercice dans le groupe et donne le glossaire réduit à quelques mots
+  paramètres:
+  - listes des exercices répartis dans leur groupe
+  - index du groupe en cours en str pour utiliser comme clef de dictionnaire
+  - le glossaire
+  - le nombre de termes à extraire pour les exercices (On ne fait pas tous les termes en même temps)
+
+  returns
+  - le numéro de l'exercice dans le groupe.
+  - les données de l'exercice filtrées pour correspondre au glossaire
+  
+  
+  !!! ATTENTION AUX EXO QUI NE PEUVENT PAS PRENDRE TOUT LES MOTS !!! 
+  """
+
+  # prends un exercice 
+  ExoNumber = randint(0,len(groupe) - 1)
+
+  # pour le ExoNumber
+  exerciceData = groupe[ExoNumber]["exercice"].copy()
+  exerciceData["questions"] = []
+
+  count = 0 # arrête si trop de terme
+  for question in groupe[ExoNumber]['exercice']['questions']:
+      if question['term'] in glossaireExo:
+          exerciceData["questions"].append(question)
+          count += 1
+      if size == count:
+          break
+
+  if len(exerciceData["questions"]) == 0: # il n'y a pas de question, ont tente de charger le premier exercice du groupe est, on prie pour qu'il y ait des questions
+    return next_data_save(groupe,strIndexGroup, glossaireExo, size)
+
+  return ExoNumber,exerciceData
+
+def get_know_list(stat):
+  """
+  ne garde que les mots déjà vue qui n'ont pas un score de 3 sur toutes les catégories. 
+  paramètres :
+  - dictionnaire sur les statistiques des termes
+  returns :
+  liste des mots pouvant êtres selectionner
+  """
+  # l'utilisateur doit faire pour chaque terme
+  scoreDef = 2          # 2 exercices correcte sur la définition
+  scoreTrad = 3         # 3 exercices correcte sur la traduction
+  scoreUtilisation = 1  # 1 exercice correcte sur l'utilisation
+
+  dictionnaryScore = {}
+  for key in stat.keys():
+    if stat[key]['definition'][0] < scoreDef or stat[key]['traduction'][0] < scoreTrad or stat[key]['utilisation'][0] < scoreUtilisation:
+      dictionnaryScore[key] = stat[key]['definition'][1] + stat[key]['traduction'][1] + stat[key]['utilisation'][1]
+  keys = sorted(dictionnaryScore.items(), key=lambda item: item[1])
+  return [item[0] for item in keys]
+
+
+def get_glossaire(indexGroup,stat,glossaire, size):
+  """
+  donne le glossaire
+  """
+  # récupére le glossaire réduit à quelque mots
+  if indexGroup == 0:
+      # initialiser le glossaire
+      if stat == {} :
+          # Selectionne les termes 
+          shuffle(glossaire)
+          glossaireExo =  [ element['term'] for element in glossaire[:size]]
+      else :
+        pasVue = []
+        glossaireStat =  get_know_list(stat)
+        
+        for element in glossaire:
+          if element['term'] not in glossaireStat:
+            pasVue.append(element['term'])
+        
+        shuffle(pasVue)
+        shuffle(glossaireStat)
+
+        if len(pasVue) == 0:
+          glossaireExo = glossaireStat[:5]
+
+        elif len(pasVue) == 1:
+          glossaireExo = glossaireStat[:4]
+          glossaireExo.append(pasVue[0])
+
+        else :
+          glossaireExo = glossaireStat[:3]
+          glossaireExo.extend(pasVue[:2])
+
+        if glossaireExo == [] and pasVue == [] :
+          stopActivity()
+
+  else :
+      glossaireExo = load("glossaireExo",None)
+      if glossaireExo is None :
+          raise ValueError("Erreur sur le glossaire")
+
+  save("glossaireExo", glossaireExo)
+  return glossaireExo
+
+
+def next_exercice(indexGroup,glossaireExo,groupe,size):
+  """
+  renvoie le type d'exo à faire et le glossaire personnalisé
+  paramètres :
+  - index du groupe en cours
+  - dictionnaire sur les statistiques des termes
+  - glossaire original avec tous les termes
+  - liste des exercices répartie dans leur groupe
+  """
+  # récupére un type d'exercice est les données nécessaires 
+  exoNumber,exerciceData = next_data(groupe,str(indexGroup), glossaireExo, size)
+
+  choixTemplate = randint(0,len(groupe[exoNumber]["template"]) -1)  # index dans la liste des templates
+  templateNumber = groupe[exoNumber]['template'][choixTemplate]    # numéro du template choisis
+
+  return templateNumber,exerciceData
+
+
+def get_small_glossaire(glossaireExo, originalGlossaire):
+  """
+  recopie les informations de originalGlossaire pour les termes dans glossaireExo 
+  """
+  smallGlossaire = []
+  for terme in originalGlossaire:
+    if terme["term"] in glossaireExo:
+      smallGlossaire.append(terme)
+
+  return smallGlossaire 
+
+
+############ CODE
+
+glossaireExo = get_glossaire(indexGroup,stat,originalGlossaire, size)
+
+save("indexGroup", indexGroup + 1)
+save("stat",stat)
+save("indexUnique", indexUnique + 1)
+
+if indexGroup == 0:
+  platon_log(glossaireExo)
+  exerciceData = get_small_glossaire(glossaireExo, originalGlossaire)
+  generateAndPlayExercise(getExerciseId(0,0),{"data": exerciceData,"":indexUnique})
+
+else :
+  templateNumber,exerciceData = next_exercice(indexGroup,glossaireExo,groupe,size)
+  generateAndPlayExercise(getExerciseId(indexGroup,templateNumber), {"data": exerciceData, "":indexUnique})

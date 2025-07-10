@@ -10,6 +10,9 @@ from src.ai_interaction import generate_glossaire
 ######## glossaire
 
 def display_help_type():
+    """
+    affiche l'aide pour la selection du type de données pour le glossaire
+    """
     print("file         : Vous avez déjà un fichier avec le glossaire")
     print("extract      : Vous avez un fichier dont vous voulez extraire le glossaire")
     print("generate     : L'ia génére elle même les données")
@@ -17,10 +20,13 @@ def display_help_type():
 def ask_glossaire_type():
     """
     récuperer le type de glosaire
+
+    return 
+    - le type de glossaire
     """
     typeGlossaire = "" # fichier / extraire / généré 
     while True:
-        type = input("type de données pour le glossaire [file | extract | generate]   :").strip()
+        type = input("type de données pour le glossaire [file | extract | generate] : ").strip()
         if type:
             if(type == "file" or type == "extract" or type == "generate"):
                 return type
@@ -33,12 +39,28 @@ def ask_glossaire_type():
         print("Pour affcher l'aide saisir : help")
 
 def read_text_file(filepath):
+    """
+    renvoie le contenu d'un fichier
+
+    paramètre 
+    - chemin du fichier à lire
+
+    return 
+    - son contenu
+    """
     with open(filepath, 'r', encoding='utf-8') as f:
         return f.read()
 
 def get_data(type, infoGeneral):
     """
-    renvoie les données du glossaire
+    renvoie le glossaire
+
+    paramètres
+    - le type de données pour le glossaire
+    - information général pour la génération 
+
+    return :
+    - le glossaire
     """
     if type == "file":
         while True:
@@ -62,16 +84,25 @@ def get_data(type, infoGeneral):
 
 def get_glossaire(infoGeneral):
     """
-    récupére le glossaire
+    demande quel type de glossaire on veut et donne le glossaire
+
+    paramètre
+    - infomation général sur l'exercice
+
+    return 
+    - le glossaiere
     """
     type = ask_glossaire_type()
     glossaire = get_data(type,infoGeneral)
     return glossaire
 
 
-######## info pour le prompt
+######## info pour les prompts
 
 def display_help_general_info():
+    """
+    affiche l'aide pour la génération d'exercice
+    """
     print("Obligatoire :")
     print(" matière : la matière de l'exercice (exemple : anglais | Math | C )")
     print(" type d'exercice : le format de l'exercice (exemple : pickers | matchList)")
@@ -90,25 +121,25 @@ def ask_general_info():
     print("\n--- Veuillez fournir les informations suivantes pour l'exercice ---")
 
     while True:
-        matiere = input("Matière            : ").strip()
+        matiere =   input("Matière                                                          : ").strip()
         if matiere:
             break
         else:
             print("La matière est obligatoire. Veuillez saisir une valeur.")
 
-    theme =         input("Thème                                   (optionnel): ").strip()
-    cible =         input("Cible                                   (optionnel): ").strip()
-    personnalite =  input("Personnalité                            (optionnel): ").strip()
-    langueInst =    input("Langue des questions                    (optionnel): ").strip()
-    indicationSup = input("Indications supplémentaires pour l'IA   (optionnel): ").strip()
+    theme =         input("Thème                                   (optionnel - None)       : ").strip()
+    cible =         input("Cible                                   (optionnel - étudiant)   : ").strip()
+    personnalite =  input("Personnalité                            (optionnel - None)       : ").strip()
+    langueInst =    input("Langue des questions                    (optionnel - Français)   : ").strip()
+    indicationSup = input("Indications supplémentaires pour l'IA   (optionnel - None)       : ").strip()
 
     info = {
         "matiere": matiere,
         "personnalite": personnalite if personnalite else None,
         "theme": theme if theme else None,
-        "cible": cible if cible else None,
+        "cible": cible if cible else "étudiant",
         "indicationSup": indicationSup if indicationSup else None,
-        "langueInst": langueInst if langueInst else "Anglais" ,
+        "langueInst": langueInst if langueInst else "français" ,
     }
 
     print("\n--- Informations collectées ---")
@@ -120,6 +151,6 @@ def ask_general_info():
             display_key = 'Indications supplémentaires'
         elif key == 'langueInst':
             display_key = 'Langue des questions'
-        print(f"{display_key}: {value if value is not None else 'Non fourni'}")
+        print(f"{display_key:<30}: {value if value is not None else 'Non fourni'}")
 
     return info

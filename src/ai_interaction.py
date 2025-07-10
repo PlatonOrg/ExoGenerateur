@@ -1,21 +1,25 @@
 """
 Fichier pour interragir avec l'ia
 """
-from datetime import datetime
 import json
 import os
+import sys
 import google.generativeai as genai
 
+from datetime import datetime
 from dotenv import load_dotenv
+from .write_file import copy_pla_default, get_allow_template, get_groupe, write_exo, write_next, write_glossaire, write_groupe
 
 GEMINI_API_KEY = None
 IA_MODEL = None
 MODEL_TYPE = 'gemini-1.5-flash'
 
-
 ########## initialisation et requête
 
 def init_ia():
+    """
+    initilialise l'envoie de requête à l'ia
+    """
     global GEMINI_API_KEY
     global IA_MODEL
     load_dotenv()
@@ -24,8 +28,8 @@ def init_ia():
     GEMINI_API_KEY = os.getenv("GOOGLE_API_KEY")
 
     if not GEMINI_API_KEY:
-        print("Erreur : La clé API Gemini (GOOGLE_API_KEY) n'est pas configurée dans votre fichier .env.")
-        print("Veuillez consulter la documentation pour savoir comment l'obtenir et la configurer.")
+        print("Erreur : La clé API Gemini (GOOGLE_API_KEY) n'est pas configurée dans votre fichier .env.", file=sys.stderr)
+        print("Veuillez consulter la documentation pour savoir comment l'obtenir et la configurer.", file=sys.stderr)
         exit()
 
     # Configure l'accès à l'API
@@ -36,17 +40,22 @@ def init_ia():
         IA_MODEL = genai.GenerativeModel(MODEL_TYPE)
         print(f"Modèle Gemini {MODEL_TYPE} initialisé avec succès.")
     except Exception as e:
-        print(f"Erreur lors de l'initialisation du modèle Gemini : {e}")
-        print("Vérifiez votre connexion internet et votre clé API.")
+        print(f"Erreur lors de l'initialisation du modèle Gemini : {e}", file=sys.stderr)
+        print("Vérifiez votre connexion internet et votre clé API.", file=sys.stderr)
         exit()
 
 def ask_gemini(prompt):
     """
     Envoie la question (prompt) au modèle Gemini et retourne sa réponse au format str.
     En cas d'erreur renvoie ""
+
+    paramètre
+    - la requête à envoyer
+
     """
     if not prompt.strip():
-        return "Erreur : La question à poser à l'IA ne peut pas être vide."
+        print("Erreur : requête vide", file=sys.stderr)
+        return ""
 
     try:
         reponseBrut = IA_MODEL.generate_content(prompt)
@@ -62,11 +71,11 @@ def ask_gemini(prompt):
             else:
                 return reponse # Pas de balises
         else:
-            print(f"L'IA n'a pas pu générer une réponse textuelle valide. Raison(s) de blocage : {reponseBrut.prompt_feedback}")
+            print(f"L'IA n'a pas pu générer une réponse textuelle valide. Raison(s) de blocage : {reponseBrut.prompt_feedback}", file=sys.stderr)
             return ""
 
     except Exception as e:
-        print(f"Une erreur est survenue lors de la communication avec l'IA : {e}")
+        print(f"Une erreur est survenue lors de la communication avec l'IA : {e}", file=sys.stderr)
         return ""
 
 ######### glossaire
@@ -74,7 +83,13 @@ def ask_gemini(prompt):
 def extract_glossaire(fileContent):
     """
     Extrait le glossaire à partir d'un texte
-    Renvoie la réponse de Gemini Json au format str
+    Renvoie la réponse de Gemini au format str
+
+    paramètre 
+    - le fichier contenant le glossaire à extraire
+
+    return 
+    - le glossaire
     """
     langueDefinition = "Anglais"
     prompt = {
@@ -97,6 +112,12 @@ def extract_glossaire(fileContent):
 def generate_glossaire(infoGeneral):
     """
     génére un glossaire
+
+    paramètre
+    - information général sur l'activité
+
+    return 
+    - le glossaire
     """
     sujet = "matière : " + infoGeneral["matiere"]
     if infoGeneral["theme"] is not None:
@@ -161,19 +182,22 @@ def generate_glossaire(infoGeneral):
     }
     
     return ask_gemini(json.dumps(prompt))
-######### prompt
+
+######### prompt dans modeles
 
 def find_exo_prompt():
     """
     Cherche les fichier prompt.txt dans modeles et tout ses sous-repertoire
-    Renvoie la liste des chemins vers les fichiers "prompt.txt"
+
+    return 
+    - la liste des chemins vers les fichiers "prompt.txt"
     """
     directory = "modeles"
     paths = []
     fileName = "prompt.txt"
 
     if not os.path.exists(directory):
-        print(f"Erreur : Le répertoire '{directory}' n'existe pas.")
+        print(f"Erreur : Le répertoire '{directory}' n'existe pas.", file=sys.stderr)
         return paths
 
     for root, _, files in os.walk(directory):
@@ -183,29 +207,56 @@ def find_exo_prompt():
             
     return paths
 
-def create_dated_output_folder(matiere):
-    directory = "./output"
-    os.makedirs(directory, exist_ok=True)
+######## génération des données des exercices
+
+def create_folder(newFolder):
+    """
+    créer un dossier
+    paramètres
+    - nom du dossier
+    """
+    try:
+        os.makedirs(newFolder)
+        print(f"Dossier créé : '{newFolder}'")
+        return True
+    except FileExistsError:
+        print(f"Attention : Le dossier '{newFolder}' existe déjà. Utilisation du dossier existant.", file=sys.stderr)
+    except Exception as e:
+        print(f"Erreur inattendue lors de la création du dossier : {e}", file=sys.stderr)
+    return False
+
+def create_dated_output_folder(matiere, saveData):
+    """
+    créer un dossier de type [matiere]_[timestamp] pour y mettre toutes les données des exercices
+
+    paramètre
+    - nom à donner au dossier avant le timestamp
+    - booleen si 
+    """
+    directory1 = "./output/Exercice"
+    directory2 = "./output/PLA"
+    os.makedirs("./output", exist_ok=True)
+    if saveData:
+        os.makedirs(directory1, exist_ok=True)
+
+    os.makedirs(directory2, exist_ok=True)
+
 
     now = datetime.now()
     
     # Format du nom de dossier : [matiere]_AAAA-MM-JJ_HH-MM-SS
     folderName = f"{matiere.replace(' ', '_')}_{now.strftime('%Y-%m-%d_%H-%M-%S')}"
-
-    newFolder = os.path.join(directory, folderName)
-
-    try:
-        os.makedirs(newFolder)
-        print(f"Dossier pour l'exercice créé : '{newFolder}'")
-        return newFolder
-    except FileExistsError:
-        print(f"Attention : Le dossier '{newFolder}' existe déjà. Utilisation du dossier existant.")
-        return ""
-    except Exception as e:
-        print(f"Erreur inattendue lors de la création du dossier : {e}")
-        return ""
-
-######## 2 prompts par question à l'ia
+    newFolderPLA = os.path.join(directory2, folderName)
+    if not create_folder(newFolderPLA) :
+        return "",""
+    if not create_folder(newFolderPLA+"/includes") :
+        return "",""
+    if saveData :
+        newFolderData = os.path.join(directory1, folderName)
+        if create_folder(newFolderData):
+            return newFolderPLA,newFolderData
+        return "",""
+    return newFolderPLA,""
 
 def generalPrompt(glossaire, generalInfo):
     """
@@ -257,73 +308,121 @@ Tu dois impérativement générer le JSON strictement selon ces instructions, en
 Assure-toi que les termes et définitions extraits du glossaire sont exactement ceux fournis, sans aucune modification ou paraphrase, à moins que les instructions de format ne spécifient explicitement une transformation.
 """
 
-def generate_data(glossaire, generalInfo):
+def get_content(lstPrompt, index):
     """
-    Génère les données pour tous les exercices en regroupant les prompts deux par deux.
+    Donne le prompt pour les exercices, les regrouper par 2 quand c'est possible
+
+    paramètres
+    - liste des emplacements de tous les prompts
+    - prompt à traiter dans la liste des prompts    
+    
+    return
+    - booleen True si erreur sinon False
+    - la liste des noms des prompts utilisés
+    - le contenu des prompts utilisés
     """
-    lstPrompt = find_exo_prompt()
-    savePrompt = 1
+    fileContents = []
+    fileNames = []
 
-    if not lstPrompt:
-        print("Aucun fichier 'prompt.txt' trouvé dans le répertoire 'modeles'. Aucune donnée générée.")
-        return
+    pathComplete1 = os.path.join("modeles", lstPrompt[index])
+    fileName1 = lstPrompt[index].replace(os.sep, '_').replace('_prompt.txt', '')
+    fileNames.append(fileName1)
+    try:
+        with open(pathComplete1, 'r', encoding='utf-8') as f:
+            fileContents.append(f.read())
+    except FileNotFoundError:
+        print(f"Erreur: Le fichier '{pathComplete1}' n'a pas été trouvé. Passage au prompt suivant.", file=sys.stderr)
+        return True, fileNames,fileContents
+    except Exception as e:
+        print(f"Erreur lors de la lecture du fichier '{pathComplete1}' : {e}", file=sys.stderr)
+        return True,  fileNames,fileContents
 
-    basePrompt = generalPrompt(glossaire, generalInfo)
-    print("Prompt général base complété.")
-
-    pathDirectory = create_dated_output_folder('Exercice')
-
-    if savePrompt > 0:
-        os.makedirs(pathDirectory + '/data', exist_ok=True)
-        with open(pathDirectory + '/data/glossaire.txt', 'w', encoding='utf-8') as f:
-            f.write(glossaire)
-
-    for i in range(0, len(lstPrompt), 2):
-        paths = []
-        fileContents = []
-        fileNames = []
-
-        path1 = lstPrompt[i]
-        pathComplete1 = os.path.join("modeles", path1)
-        fileName1 = path1.replace(os.sep, '_').replace('_prompt.txt', '')
-        paths.append(pathComplete1)
-        fileNames.append(fileName1)
+    if index + 1 < len(lstPrompt):
+        pathComplete2 = os.path.join("modeles", lstPrompt[index+1])
+        fileName2 = lstPrompt[index+1].replace(os.sep, '_').replace('_prompt.txt', '')
+        fileNames.append(fileName2)
         try:
-            with open(pathComplete1, 'r', encoding='utf-8') as f:
+            with open(pathComplete2, 'r', encoding='utf-8') as f:
                 fileContents.append(f.read())
         except FileNotFoundError:
-            print(f"Erreur: Le fichier '{pathComplete1}' n'a pas été trouvé. Passage au prompt suivant.")
-            continue
+            print(f"Erreur: Le fichier '{pathComplete2}' n'a pas été trouvé. Traitement du premier prompt seul.", file=sys.stderr)
+            return True, fileNames,fileContents
         except Exception as e:
-            print(f"Erreur lors de la lecture du fichier '{pathComplete1}' : {e}")
-            continue
+            print(f"Erreur lors de la lecture du fichier '{pathComplete2}' : {e}", file=sys.stderr)
+            return True, fileNames,fileContents
+        
+    return False, fileNames,fileContents
 
-        if i + 1 < len(lstPrompt):
-            path2 = lstPrompt[i+1]
-            pathComplete2 = os.path.join("modeles", path2)
-            fileName2 = path2.replace(os.sep, '_').replace('_prompt.txt', '')
-            paths.append(pathComplete2)
-            fileNames.append(fileName2)
-            try:
-                with open(pathComplete2, 'r', encoding='utf-8') as f:
-                    fileContents.append(f.read())
-            except FileNotFoundError:
-                print(f"Erreur: Le fichier '{pathComplete2}' n'a pas été trouvé. Traitement du premier prompt seul.")
-                pass
-            except Exception as e:
-                print(f"Erreur lors de la lecture du fichier '{pathComplete2}' : {e}")
-                pass
+def get_promptAsk(basePrompt, fileContents):
+    """
+    donne le prompt complet pour la requête à l'ia
+
+    paramètres
+    - le prompt de base
+    - liste contenant 1 prompt pour 1 exercice ou 2 pour 2 exercices
+
+    return
+    - prompt complet pour l'ia
+    """
+    promptAsk = basePrompt + "\n\n"
+    if len(fileContents) == 2:
+        promptAsk += "\n---"
+        promptAsk += f"\n### Instructions de format et type d'exercice 1 :\n\n{fileContents[0]}"
+        promptAsk += "\n---"
+        promptAsk += f"\n### Instructions de format et type d'exercice 2 :\n\n{fileContents[1]}"
+    elif len(fileContents) == 1:
+        promptAsk += "\n---"
+        promptAsk += f"\n### Instructions de format et type d'exercice 1 :\n\n{fileContents[0]}"
+    return promptAsk
+
+def generate_data(glossaire, generalInfo):
+    """
+    Génère les données pour tous les exercices en regroupant les prompts deux par deux. et complete le fichier next.py
+
+    paramètres
+    - le glossaire à utiliser
+    - information générale sur l'activité
+    """
+    # initialisation des données
+    lstPrompt = find_exo_prompt()   # cherche les prompt.txt dans modeles
+    savePrompt = 1                  # 0 sauvegarde rien, 1 sauvegarde la glossaire, 2 redonne les prompts par exercice
+    saveGroup = 1                   # groupe des exercices ) sauvegarder 1-définition, 2-traduction, 2-utilation
+    indexInGroup = 0                # index de l'exercice dans le groupe
+    lstGroupe = []                  # liste des exercices dans le groupe
+
+    saveData = True                 # Si False ne génère que les fichiers nécessaire pour le pla
+
+    if not lstPrompt:
+        print("Aucun fichier 'prompt.txt' trouvé dans le répertoire 'modeles'. Aucune donnée générée.", file=sys.stderr)
+        return
+    
+    basePrompt = generalPrompt(glossaire, generalInfo)
+    print("Prompt général complété.")
+
+    pathPLADirectory,pathDataDirectory = create_dated_output_folder('Exercice', saveData)
+    if pathPLADirectory == "":
+        return # erreur création des dossiers
+
+    pathNext_py = pathPLADirectory + "/next.py"
+    includePLAPath = pathPLADirectory + "/includes"
 
 
-        promptAsk = basePrompt + "\n\n"
-        if len(fileContents) == 2:
-            promptAsk += "\n---"
-            promptAsk += f"\n### Instructions de format et type d'exercice 1 :\n\n{fileContents[0]}"
-            promptAsk += "\n---"
-            promptAsk += f"\n### Instructions de format et type d'exercice 2 :\n\n{fileContents[1]}"
-        elif len(fileContents) == 1:
-            promptAsk += "\n---"
-            promptAsk += f"\n### Instructions de format et type d'exercice 1 :\n\n{fileContents[0]}" # Changed to '1' for consistency in prompt structure
+    write_glossaire(includePLAPath + "/glossaire.json",glossaire)
+
+
+    if savePrompt > 0 and saveData:
+        os.makedirs(pathDataDirectory + '/data', exist_ok=True)
+        with open(pathDataDirectory + '/data/glossaire.txt', 'w', encoding='utf-8') as f:
+            f.write(glossaire)
+
+    # parcours les prompts et génère les exercices
+    for i in range(0, len(lstPrompt), 2):
+
+        erreur,fileNames,fileContents = get_content(lstPrompt,i)
+        if erreur:
+            continue # il y a eu un problème lors de la récupération des données
+
+        promptAsk = get_promptAsk(basePrompt,fileContents)
 
         try:
             reponse = ask_gemini(promptAsk)
@@ -331,40 +430,44 @@ def generate_data(glossaire, generalInfo):
             if "exercices" in reponseJson and isinstance(reponseJson["exercices"], list):
                 if len(reponseJson["exercices"]) == len(fileNames):
                     for idx, exercise_data in enumerate(reponseJson["exercices"]):
-                        exerciceName = f'{pathDirectory}/{fileNames[idx]}.json'
-                        try:
-                            with open(exerciceName, 'w', encoding='utf-8') as f:
-                                json.dump(exercise_data, f, indent=4, ensure_ascii=False)
-                            print(f"Exercice '{fileNames[idx]:<40}.json' généré")
+                        if saveData :
+                            exerciceName = f'{pathDataDirectory}/{fileNames[idx]}.json'
 
-                            if savePrompt > 1:
-                                outputNameData = f"{pathDirectory}/data/prompt_{fileNames[idx]}.txt"
-                                with open(outputNameData, 'w', encoding='utf-8') as f:
-                                    f.write(fileContents[idx])
+                            write_exo(exerciceName,exercise_data,fileNames[idx],pathDataDirectory,fileContents[idx],savePrompt if saveData else 0)
 
-                        except Exception as e:
-                            print(f"Erreur lors de l'écriture de l'exercice '{fileNames[idx]}.json' : {e}")
+                        groupe = get_groupe(fileNames[idx])
+                        if groupe != saveGroup :
+                            write_groupe(includePLAPath,lstGroupe,saveGroup)
+                            lstGroupe = [{
+                                "template" : get_allow_template(fileNames[idx]),
+                                "exercice": exercise_data
+                            }]
+                            saveGroup = groupe
+                            indexInGroup = 0
+                        else :
+                            lstGroupe.append({
+                                "template" : get_allow_template(fileNames[idx]),
+                                "exercice": exercise_data
+                            })
+
+                        name = "'"+fileNames[idx] + ".json'"
+                        print(f"Exercice {name:<40} généré (index : {indexInGroup})")
+                        indexInGroup += 1
+
                 else:
-                    print(f"Erreur : Le nombre d'exercices générés par Gemini ({len(reponseJson['exercices'])}) ne correspond pas au nombre de prompts envoyés ({len(fileNames)})")
-                    print("Les exercices générés (le cas échéant) seront sauvegardés avec des noms génériques.")
-                    for idx, exercise_data in enumerate(reponseJson["exercices"]):
-                        exerciceName = f'{pathDirectory}/mismatch_exo_{fileNames[0]}_{idx}.json' # Use first filename as a hint
-                        try:
-                            with open(exerciceName, 'w', encoding='utf-8') as f:
-                                json.dump(exercise_data, f, indent=4, ensure_ascii=False)
-                            print(f"Exercice généré avec nom générique '{exerciceName}'.")
-                        except Exception as write_err:
-                            print(f"Erreur lors de la sauvegarde générique de l'exercice {idx}: {write_err}")
+                    print(f"Erreur : Le nombre d'exercices générés par Gemini ({len(reponseJson['exercices'])}) ne correspond pas au nombre de prompts envoyés ({len(fileNames)})", file=sys.stderr)
+                    print(f"Le fichier qui devait être généré était : {fileNames}", file=sys.stderr)
             else:
-                print(f"Erreur : Le format de la réponse est invalide pour les prompts {', '.join(fileNames)}. La clé 'exercices' est manquante ou n'est pas une liste.")
-                print(f"Réponse complète reçue:\n{reponse[:500]}...")
+                print(f"Erreur : Le format de la réponse est invalide pour les prompts {', '.join(fileNames)}. La clé 'exercices' est manquante ou n'est pas une liste.", file=sys.stderr)
+                print(f"Réponse complète reçue:\n{reponse}", file=sys.stderr)
 
         except json.JSONDecodeError as e:
-            if savePrompt == 0 :
-                os.makedirs(pathDirectory + '/data', exist_ok=True)
-            with open(pathDirectory + '/data/erreur.txt', 'w', encoding='utf-8') as f:
-                f.write(str(reponse))
-            print(f"Erreur de décodage JSON de la réponse complète : {e}. Réponse reçue:\n{reponse}...")
+            print(f"Erreur de décodage JSON de la réponse complète : {e}. Réponse reçue:\n{reponse}", file=sys.stderr)
+            
         except Exception as e:
-            print(f"Erreur lors du traitement de la réponse Gemini : {e}")
+            print(f"Erreur lors du traitement de la réponse Gemini : {e}", file=sys.stderr)
+
+    write_groupe(includePLAPath,lstGroupe,saveGroup)
+    write_next(pathNext_py)
+    copy_pla_default(pathPLADirectory)
     print("\nfin de la génération des exercices\n")

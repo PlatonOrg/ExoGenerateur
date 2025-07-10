@@ -1,0 +1,137 @@
+{
+  "title": "",
+  "introduction": "",
+  "conclusion": "",
+  "settings": {
+    "duration": 0,
+    "navigation": {
+      "mode": "next"
+    },
+    "actions": {
+      "retry": 1,
+      "hints": true,
+      "reroll": true,
+      "theories": true,
+      "solution": true
+    },
+    "feedback": {
+      "review": true,
+      "validation": true
+    },
+    "security": {
+      "noCopyPaste": false,
+      "terminateOnLeavePage": false,
+      "terminateOnLoseFocus": false
+    },
+    "nextSettings": {
+      "sandbox": "python",
+      "autoNext": false,
+      "autoNextGrade": 0,
+      "allowFreeNavigation": true,
+      "hasExercisesVariables": true
+    },
+    "seedPerExercise": false
+  },
+  "exerciseGroups": {
+    "0": {
+      "name": "presentation",
+      "exercises": [
+        {
+          "id": "bbe92832-6ca2-4124-9e84-5cc0c6f2b115",
+          "version": "latest",
+          "resource": "58b1e6e3-7e81-42ae-9946-43991a67b763"
+        }
+      ]
+    },
+    "1": {
+      "name": "definition",
+      "exercises": [
+        {
+          "id": "77dec848-fc77-4041-a329-00d6af437222",
+          "version": "latest",
+          "resource": "cb6a982e-7914-4cd7-92f3-d532d984adbd"
+        },
+        {
+          "id": "0be05df7-be87-4085-8a4b-d0c42b1506a8",
+          "version": "latest",
+          "resource": "c9685834-b2bb-4001-a954-e1da58fd2396"
+        },
+        {
+          "id": "82070c94-8e21-4bce-a7dc-a49fc9aa26d2",
+          "version": "latest",
+          "resource": "70b5384b-215b-401c-992e-3da2ddc4c12d"
+        },
+        {
+          "id": "4f1cf8b3-e102-4df1-89e9-5962482f374b",
+          "version": "latest",
+          "resource": "48909b58-39b7-4aa5-b3cc-afe8545bdb72"
+        }
+      ]
+    },
+    "2": {
+      "name": "traduction",
+      "exercises": [
+        {
+          "id": "9067b318-4f89-406d-ae38-2a015a857c06",
+          "version": "latest",
+          "resource": "cb6a982e-7914-4cd7-92f3-d532d984adbd"
+        },
+        {
+          "id": "1d13e908-f7c2-4d23-b379-11b2d29c6b87",
+          "version": "latest",
+          "resource": "48909b58-39b7-4aa5-b3cc-afe8545bdb72"
+        },
+        {
+          "id": "0f37d072-5190-4b0c-8517-86b48fd51f1e",
+          "version": "latest",
+          "resource": "f2ab64dd-0d52-4e27-a833-e2be97baa3b8"
+        },
+        {
+          "id": "15ed91dc-4bff-4f55-8c0a-f172f1aff2a9",
+          "version": "latest",
+          "resource": "70b5384b-215b-401c-992e-3da2ddc4c12d"
+        }
+      ]
+    },
+    "3": {
+      "name": "utilisation",
+      "exercises": [
+        {
+          "id": "0d2a9ea3-edd7-4871-9a6c-14469821a01e",
+          "version": "latest",
+          "resource": "48909b58-39b7-4aa5-b3cc-afe8545bdb72"
+        },
+        {
+          "id": "7cb0f901-c88e-4fc5-ad13-718aed754ff0",
+          "version": "latest",
+          "resource": "70b5384b-215b-401c-992e-3da2ddc4c12d"
+        },
+        {
+          "id": "7807799b-e4a3-4186-bc51-47d886b070db",
+          "version": "latest",
+          "resource": "07d02231-1a32-4dcc-afd5-684cdff6269b"
+        },
+        {
+          "id": "cd1bbfab-6bd3-48a3-9056-7a3a99ed95ad",
+          "version": "latest",
+          "resource": "9e81a412-831a-4856-8c87-c0b8f43bca44"
+        },
+        {
+          "id": "80fd2613-96d4-44d0-b802-f35844784533",
+          "version": "latest",
+          "resource": "044dc9aa-6744-494b-b6d4-76a2fe917b1f"
+        },
+        {
+          "id": "bc0052c6-20ec-49db-84ef-0972235e7761",
+          "version": "latest",
+          "resource": "54722032-2641-498b-a8f8-9ee9cd5273ab"
+        },
+        {
+          "id": "fcb6eff5-6d31-4258-a044-9bd3eeeff701",
+          "version": "latest",
+          "resource": "acf54055-c94d-4238-94f2-d2ca9d5299fa"
+        }
+      ]
+    }
+  }
+}
