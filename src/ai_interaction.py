@@ -8,7 +8,7 @@ import google.generativeai as genai
 
 from datetime import datetime
 from dotenv import load_dotenv
-from .write_file import copy_pla_default, get_allow_template, get_groupe, write_exo, write_next, write_glossaire, write_groupe
+from .write_file import copy_pla_default, create_relative_zip_and_cleanup, get_allow_template, get_groupe, write_next, write_glossaire, write_groupe
 
 GEMINI_API_KEY = None
 IA_MODEL = None
@@ -111,22 +111,22 @@ def extract_glossaire(fileContent):
 
 def generate_glossaire(infoGeneral):
     """
-    génére un glossaire
+    génère un glossaire
 
     paramètre
     - information général sur l'activité
 
-    return 
+    return
     - le glossaire
     """
     sujet = "matière : " + infoGeneral["matiere"]
     if infoGeneral["theme"] is not None:
         sujet += " , thème : " + infoGeneral["theme"]
-        
+
     if infoGeneral["indicationSup"] is not None:
         sujet += " , indications supplémentaires : " + infoGeneral["indicationSup"]
     langueDefinition = infoGeneral["matiere"]
-    langueTraduction = "Francais" 
+    langueTraduction = "Francais"
     prompt = {
         "model": MODEL_TYPE,
         "messages": [
@@ -135,7 +135,7 @@ def generate_glossaire(infoGeneral):
                 "content": f"""Tu es un expert linguistique et terminologue de renom, spécialisé dans la création de glossaires techniques et conceptuels. Ton rôle est de générer un glossaire complet et précis sur le sujet spécifié par l'utilisateur. Pour chaque terme pertinent que tu identifieras ou créeras, tu devras fournir:
                 1.  Le terme lui-même.
                     ***RÈGLE ABSOLUE POUR LE 'TERM' : Le 'term' doit être un unique mot de dictionnaire, ou un nom composé très court (maximum 2-3 mots si inséparable, comme "Artificial Intelligence"). AUCUNE phrase, AUCUNE question, AUCUNE réponse, AUCUNE expression verbale avec "to" + verbe + complément, AUCUNE expression idiomatique longue.***
-                    
+
                     ***RÈGLE DE CASSE POUR LE 'TERM' : Le 'term' DOIT commencer par une MINUSCULE, sauf s'il s'agit d'un NOM PROPRE (ex: "France", "Paris") ou d'un ACRONYME (ex: "NATO", "AI"). Pour tout autre terme, y compris les noms communs ou composés, il DOIT commencer par une minuscule. N'utilise JAMAIS de majuscule pour un nom commun, même s'il apparaît en début de phrase dans une définition.***
 
                     **ACCEPTE UNIQUEMENT LES TERMES DE CE TYPE ET CASSE :**
@@ -150,7 +150,7 @@ def generate_glossaire(infoGeneral):
 
                 2.  Une définition concise et claire, rédigée en {langueDefinition}.
                     ***CONTRAINTE DE DÉFINITION : La définition DOIT être simple à comprendre, complète, et ne DOIT PAS contenir le terme qu'elle définit afin d'éviter toute circularité et de garantir une explication autonome.***
-                3.  Des traductions pour ce terme. L'objet 'translation' DOIT toujours inclure les clés '{langueDefinition}' et '{langueTraduction}'. Si un terme est déjà dans l'une de ces langues, la valeur de sa traduction pour cette langue peut être le terme lui-même (si universellement reconnu) ou une chaîne vide. Pour les autres cas, fournis la traduction appropriée.
+                3.  Des traductions pour ce terme. L'objet 'translation' DOIT toujours inclure les clés '{langueDefinition}' et '{langueTraduction}'. Si un terme est déjà dans l'une de ces langues, la valeur de sa traduction pour cette langue peut être le terme lui-même (si universellement reconnu) ou une chaîne vide. Pour les autres cas, fournis la traduction la plus courante et appropriée.
 
                 Assure-toi que la sortie est un tableau JSON STRICTEMENT conforme au format spécifié, où chaque entrée représente un terme du glossaire. Maintiens une cohérence parfaite dans la structure des clés de l'objet 'translation' pour toutes les entrées. Concentre-toi sur les termes clés et les concepts fondamentaux du sujet.
                 """
@@ -175,12 +175,12 @@ def generate_glossaire(infoGeneral):
         // ... autres termes
     ]
     '''
+            }
+        ],
+        "response_format": { "type": "json_object" },
+        "temperature": 0.3 # Une température légèrement plus élevée peut aider à générer plus de termes variés, tout en restant structuré.
     }
-    ],
-    "response_format": { "type": "json_object" },
-    "temperature": 0.3 # Une température légèrement plus élevée peut aider à générer plus de termes variés, tout en restant structuré.
-    }
-    
+
     return ask_gemini(json.dumps(prompt))
 
 ######### prompt dans modeles
@@ -225,7 +225,7 @@ def create_folder(newFolder):
         print(f"Erreur inattendue lors de la création du dossier : {e}", file=sys.stderr)
     return False
 
-def create_dated_output_folder(matiere, saveData):
+def create_dated_output_folder(matiere):
     """
     créer un dossier de type [matiere]_[timestamp] pour y mettre toutes les données des exercices
 
@@ -233,11 +233,8 @@ def create_dated_output_folder(matiere, saveData):
     - nom à donner au dossier avant le timestamp
     - booleen si 
     """
-    directory1 = "./output/Exercice"
     directory2 = "./output/PLA"
     os.makedirs("./output", exist_ok=True)
-    if saveData:
-        os.makedirs(directory1, exist_ok=True)
 
     os.makedirs(directory2, exist_ok=True)
 
@@ -248,15 +245,10 @@ def create_dated_output_folder(matiere, saveData):
     folderName = f"{matiere.replace(' ', '_')}_{now.strftime('%Y-%m-%d_%H-%M-%S')}"
     newFolderPLA = os.path.join(directory2, folderName)
     if not create_folder(newFolderPLA) :
-        return "",""
+        return ""
     if not create_folder(newFolderPLA+"/includes") :
-        return "",""
-    if saveData :
-        newFolderData = os.path.join(directory1, folderName)
-        if create_folder(newFolderData):
-            return newFolderPLA,newFolderData
-        return "",""
-    return newFolderPLA,""
+        return ""
+    return newFolderPLA
 
 def generalPrompt(glossaire, generalInfo):
     """
@@ -385,12 +377,9 @@ def generate_data(glossaire, generalInfo):
     """
     # initialisation des données
     lstPrompt = find_exo_prompt()   # cherche les prompt.txt dans modeles
-    savePrompt = 1                  # 0 sauvegarde rien, 1 sauvegarde la glossaire, 2 redonne les prompts par exercice
     saveGroup = 1                   # groupe des exercices ) sauvegarder 1-définition, 2-traduction, 2-utilation
     indexInGroup = 0                # index de l'exercice dans le groupe
     lstGroupe = []                  # liste des exercices dans le groupe
-
-    saveData = True                 # Si False ne génère que les fichiers nécessaire pour le pla
 
     if not lstPrompt:
         print("Aucun fichier 'prompt.txt' trouvé dans le répertoire 'modeles'. Aucune donnée générée.", file=sys.stderr)
@@ -399,7 +388,7 @@ def generate_data(glossaire, generalInfo):
     basePrompt = generalPrompt(glossaire, generalInfo)
     print("Prompt général complété.")
 
-    pathPLADirectory,pathDataDirectory = create_dated_output_folder('Exercice', saveData)
+    pathPLADirectory = create_dated_output_folder('Exercice')
     if pathPLADirectory == "":
         return # erreur création des dossiers
 
@@ -408,12 +397,6 @@ def generate_data(glossaire, generalInfo):
 
 
     write_glossaire(includePLAPath + "/glossaire.json",glossaire)
-
-
-    if savePrompt > 0 and saveData:
-        os.makedirs(pathDataDirectory + '/data', exist_ok=True)
-        with open(pathDataDirectory + '/data/glossaire.txt', 'w', encoding='utf-8') as f:
-            f.write(glossaire)
 
     # parcours les prompts et génère les exercices
     for i in range(0, len(lstPrompt), 2):
@@ -430,10 +413,6 @@ def generate_data(glossaire, generalInfo):
             if "exercices" in reponseJson and isinstance(reponseJson["exercices"], list):
                 if len(reponseJson["exercices"]) == len(fileNames):
                     for idx, exercise_data in enumerate(reponseJson["exercices"]):
-                        if saveData :
-                            exerciceName = f'{pathDataDirectory}/{fileNames[idx]}.json'
-
-                            write_exo(exerciceName,exercise_data,fileNames[idx],pathDataDirectory,fileContents[idx],savePrompt if saveData else 0)
 
                         groupe = get_groupe(fileNames[idx])
                         if groupe != saveGroup :
@@ -471,3 +450,4 @@ def generate_data(glossaire, generalInfo):
     write_next(pathNext_py)
     copy_pla_default(pathPLADirectory)
     print("\nfin de la génération des exercices\n")
+    create_relative_zip_and_cleanup(pathPLADirectory,pathPLADirectory + ".zip")

@@ -152,5 +152,5 @@ def ask_general_info():
         elif key == 'langueInst':
             display_key = 'Langue des questions'
         print(f"{display_key:<30}: {value if value is not None else 'Non fourni'}")
-
+    print("\n")
     return info

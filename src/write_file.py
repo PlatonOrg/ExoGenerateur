@@ -6,6 +6,7 @@ import json
 import os
 import shutil
 import sys
+import zipfile
 
 ############### INCLUDES
 ALLOW_TEMPLATE = {
@@ -140,27 +141,37 @@ def copy_pla_default(pathPLADirectory):
     except Exception as e:
         print(f"Une erreur est survenue lors de la copie des fichiers : {e}", file=sys.stderr)
 
-############### EXERCICE
-def write_exo(exerciceName,exercise_data,exoTypeName,pathDirectory,fileContent,savePrompt):
-    """
-    écrit l'exercice dans le dossier indiquer par pathDirectory
 
-    paramètres
-    - nom du fichier .json
-    - contenu du fichier .json
-    - nom du type d'exercice
-    - chemin vers le dossier où écrire les fichiers
-    - le prompt de l'exercice
-    - > 1 pour sauvegarder le prompt
+############### ZIP
+def create_relative_zip_and_cleanup(source_dir, output_zip_path):
     """
+    Args:
+        source_dir (str): Le chemin du dossier à ziper (ex: 'Exo').
+        output_zip_path (str): Le chemin complet du fichier ZIP à créer (ex: 'Exo_content.zip').
+    """
+    if not os.path.isdir(source_dir):
+        print(f"Erreur : Le dossier source '{source_dir}' n'existe pas.")
+        return
+
     try:
-        with open(exerciceName, 'w', encoding='utf-8') as f:
-            json.dump(exercise_data, f, indent=4, ensure_ascii=False)
+        with zipfile.ZipFile(output_zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+            for root, dirs, files in os.walk(source_dir):
+                relative_path_in_zip = os.path.relpath(root, source_dir)
 
-        if savePrompt > 1:
-            outputNameData = f"{pathDirectory}/data/prompt_{exoTypeName}.txt"
-            with open(outputNameData, 'w', encoding='utf-8') as f:
-                f.write(fileContent)
+                if relative_path_in_zip != '.': # '.' signifie le dossier source lui-même
+                    zipf.write(root, relative_path_in_zip)
 
+                for file_name in files:
+                    full_file_path = os.path.join(root, file_name)
+                    arcname = os.path.relpath(full_file_path, source_dir)
+                    zipf.write(full_file_path, arcname)
+
+        print(f"Archive '{output_zip_path}' créée avec succès.")
+
+        shutil.rmtree(source_dir)
+        print(f"Dossier source '{source_dir}' supprimé avec succès.")
+
+    except FileNotFoundError:
+        print(f"Erreur : Un fichier ou dossier n'a pas été trouvé pendant l'opération.")
     except Exception as e:
-        print(f"Erreur lors de l'écriture de l'exercice '{exoTypeName}.json' : {e}", file=sys.stderr)
+        print(f"Une erreur est survenue : {e}")
