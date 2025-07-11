@@ -239,7 +239,6 @@ save("stat",stat)
 save("indexUnique", indexUnique + 1)
 
 if indexGroup == 0:
-  platon_log(glossaireExo)
   exerciceData = get_small_glossaire(glossaireExo, originalGlossaire)
   generateAndPlayExercise(getExerciseId(0,0),{"data": exerciceData,"":indexUnique})
 

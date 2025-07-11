@@ -27,44 +27,49 @@
       "sandbox": "python",
       "autoNext": false,
       "autoNextGrade": 0,
-      "allowFreeNavigation": true,
+      "allowFreeNavigation": false,
       "hasExercisesVariables": true
     },
     "seedPerExercise": false
   },
   "exerciseGroups": {
     "0": {
-      "name": "presentation",
+      "name": "présentation",
       "exercises": [
         {
-          "id": "bbe92832-6ca2-4124-9e84-5cc0c6f2b115",
+          "id": "3b5caff9-b5e5-4c49-9233-9f882f45f445",
           "version": "latest",
-          "resource": "58b1e6e3-7e81-42ae-9946-43991a67b763"
+          "resource": "be0118d6-0c47-455e-bc69-b2c3c031a3db"
+        },
+        {
+          "id": "deae8700-e6ed-417f-9ce4-d640e9c6785f",
+          "version": "latest",
+          "resource": "d33a40db-a8df-4469-8e7c-f211f2b58c05"
         }
       ]
     },
     "1": {
-      "name": "definition",
+      "name": "définition",
       "exercises": [
         {
-          "id": "77dec848-fc77-4041-a329-00d6af437222",
+          "id": "8783774f-48b8-48fc-8851-3f49c927aa3b",
           "version": "latest",
-          "resource": "cb6a982e-7914-4cd7-92f3-d532d984adbd"
+          "resource": "94e6ef08-a1f1-4109-a633-0d558ef0d125"
         },
         {
-          "id": "0be05df7-be87-4085-8a4b-d0c42b1506a8",
+          "id": "bc48001a-7732-4a38-9d00-136008d0442f",
           "version": "latest",
-          "resource": "c9685834-b2bb-4001-a954-e1da58fd2396"
+          "resource": "badd9461-9f3a-4201-80b0-f2c43d391e72"
         },
         {
-          "id": "82070c94-8e21-4bce-a7dc-a49fc9aa26d2",
+          "id": "5acb8b8f-9714-45d0-b3ad-65dcb2e14ce9",
           "version": "latest",
-          "resource": "70b5384b-215b-401c-992e-3da2ddc4c12d"
+          "resource": "1251ca4d-915f-4271-a82b-9d38182841f9"
         },
         {
-          "id": "4f1cf8b3-e102-4df1-89e9-5962482f374b",
+          "id": "c1761cd0-076b-445d-84d3-15db4d61d22d",
           "version": "latest",
-          "resource": "48909b58-39b7-4aa5-b3cc-afe8545bdb72"
+          "resource": "0085d062-031a-4b45-be2b-23c2a4fee487"
         }
       ]
     },
@@ -72,24 +77,24 @@
       "name": "traduction",
       "exercises": [
         {
-          "id": "9067b318-4f89-406d-ae38-2a015a857c06",
+          "id": "b39344c2-de5c-473b-8961-e911aaaa051f",
           "version": "latest",
-          "resource": "cb6a982e-7914-4cd7-92f3-d532d984adbd"
+          "resource": "94e6ef08-a1f1-4109-a633-0d558ef0d125"
         },
         {
-          "id": "1d13e908-f7c2-4d23-b379-11b2d29c6b87",
+          "id": "c8e3bb97-2d6c-4a92-a894-f4d3065309e5",
           "version": "latest",
-          "resource": "48909b58-39b7-4aa5-b3cc-afe8545bdb72"
+          "resource": "0085d062-031a-4b45-be2b-23c2a4fee487"
         },
         {
-          "id": "0f37d072-5190-4b0c-8517-86b48fd51f1e",
+          "id": "fdc67d38-c29c-408e-afd9-58e1aacc9289",
           "version": "latest",
-          "resource": "f2ab64dd-0d52-4e27-a833-e2be97baa3b8"
+          "resource": "f4edca3d-5597-450b-b826-d8e1ca73207e"
         },
         {
-          "id": "15ed91dc-4bff-4f55-8c0a-f172f1aff2a9",
+          "id": "4f4f8ed0-80b7-400a-bb95-8541969f055b",
           "version": "latest",
-          "resource": "70b5384b-215b-401c-992e-3da2ddc4c12d"
+          "resource": "1251ca4d-915f-4271-a82b-9d38182841f9"
         }
       ]
     },
@@ -97,39 +102,39 @@
       "name": "utilisation",
       "exercises": [
         {
-          "id": "0d2a9ea3-edd7-4871-9a6c-14469821a01e",
+          "id": "53d71984-187a-4172-9ed7-f7ef2b089271",
           "version": "latest",
-          "resource": "48909b58-39b7-4aa5-b3cc-afe8545bdb72"
+          "resource": "0085d062-031a-4b45-be2b-23c2a4fee487"
         },
         {
-          "id": "7cb0f901-c88e-4fc5-ad13-718aed754ff0",
+          "id": "1a3c934b-0521-4e50-b1a2-895e0eda3e24",
           "version": "latest",
-          "resource": "70b5384b-215b-401c-992e-3da2ddc4c12d"
+          "resource": "1251ca4d-915f-4271-a82b-9d38182841f9"
         },
         {
-          "id": "7807799b-e4a3-4186-bc51-47d886b070db",
+          "id": "50ffab59-9ab3-48ad-aeb1-4872adab1f0d",
           "version": "latest",
-          "resource": "07d02231-1a32-4dcc-afd5-684cdff6269b"
+          "resource": "b8c47e37-ea06-45e5-b454-3d5a977db143"
         },
         {
-          "id": "cd1bbfab-6bd3-48a3-9056-7a3a99ed95ad",
+          "id": "6984170a-4227-4b56-8c3e-4edca062e1d7",
           "version": "latest",
-          "resource": "9e81a412-831a-4856-8c87-c0b8f43bca44"
+          "resource": "71fa20ba-f288-4b1d-a849-301039b10980"
         },
         {
-          "id": "80fd2613-96d4-44d0-b802-f35844784533",
+          "id": "c640756f-dbe9-4011-8780-a8cf107328e3",
           "version": "latest",
-          "resource": "044dc9aa-6744-494b-b6d4-76a2fe917b1f"
+          "resource": "09814ae6-5f5d-488f-92ef-bc890eef0d40"
         },
         {
-          "id": "bc0052c6-20ec-49db-84ef-0972235e7761",
+          "id": "29d24ffb-7ffb-4a8e-a935-adbcd127f7a8",
           "version": "latest",
-          "resource": "54722032-2641-498b-a8f8-9ee9cd5273ab"
+          "resource": "bae50fb9-69d1-409b-bd06-b38129c95307"
         },
         {
-          "id": "fcb6eff5-6d31-4258-a044-9bd3eeeff701",
+          "id": "6d24fc71-8a4d-4e12-ac4a-633fbbf6287e",
           "version": "latest",
-          "resource": "acf54055-c94d-4238-94f2-d2ca9d5299fa"
+          "resource": "3fa77771-446f-4ef4-9d85-d5d2ad6aaf18"
         }
       ]
     }
