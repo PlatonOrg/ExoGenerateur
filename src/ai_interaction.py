@@ -212,8 +212,12 @@ def find_exo_prompt():
 def create_folder(newFolder):
     """
     créer un dossier
+    
     paramètres
     - nom du dossier
+    
+    return 
+    - True si aucun problème, False sinon
     """
     try:
         os.makedirs(newFolder)
@@ -225,24 +229,20 @@ def create_folder(newFolder):
         print(f"Erreur inattendue lors de la création du dossier : {e}", file=sys.stderr)
     return False
 
-def create_dated_output_folder(matiere):
+def create_dated_output_folder(name):
     """
-    créer un dossier de type [matiere]_[timestamp] pour y mettre toutes les données des exercices
+    créer un dossier de type [name]_[timestamp] pour y mettre toutes les données des exercices
 
     paramètre
     - nom à donner au dossier avant le timestamp
-    - booleen si 
     """
-    directory2 = "./output/PLA"
-    os.makedirs("./output", exist_ok=True)
-
+    directory2 = "./output"
     os.makedirs(directory2, exist_ok=True)
-
 
     now = datetime.now()
     
     # Format du nom de dossier : [matiere]_AAAA-MM-JJ_HH-MM-SS
-    folderName = f"{matiere.replace(' ', '_')}_{now.strftime('%Y-%m-%d_%H-%M-%S')}"
+    folderName = f"{name.replace(' ', '_')}_{now.strftime('%Y-%m-%d_%H-%M-%S')}"
     newFolderPLA = os.path.join(directory2, folderName)
     if not create_folder(newFolderPLA) :
         return ""
@@ -252,9 +252,14 @@ def create_dated_output_folder(matiere):
 
 def generalPrompt(glossaire, generalInfo):
     """
-    Génère le prompt général pour la création d'exercices regroupés.
-    Ce prompt est conçu pour être complété dynamiquement avec les instructions spécifiques
-    de chaque exercice par la fonction generate_data.
+    Génère le prompt général pour la création d'exercices regroupés deux par deux.
+
+    paramètres :
+    - le glossaire à utiliser
+    - les informations général
+
+    return
+    - le prompt général
     """
     langue = generalInfo.get('langueInst', generalInfo['matiere'])
     matiere = generalInfo['matiere']

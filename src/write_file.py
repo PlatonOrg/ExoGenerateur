@@ -1,14 +1,13 @@
 """
 fichier pour écrire le next.py pour l'activité
 """
-# nom du fichier sans le .json : liste des template pouvant être utiliser en fonction de sont groupe
 import json
 import os
 import shutil
 import sys
 import zipfile
 
-############### INCLUDES
+# nom du fichier sans le .json : liste des template pouvant être utiliser en fonction de sont groupe
 ALLOW_TEMPLATE = {
     # groupe definition
     "definition_picker" : [0],
@@ -28,6 +27,8 @@ ALLOW_TEMPLATE = {
     "traduction_match" : [1,2,3]
 }
 
+############### /INCLUDES
+
 def get_groupe(fileName) :
     """
     donne le numéro du groupe
@@ -45,6 +46,7 @@ def get_groupe(fileName) :
 def get_allow_template(exoType):
     """
     donne la liste des templates pouvant être utilisé suivant le type d'exercice
+    
     paramètre:
     - nom du type d'exercice
 
@@ -85,11 +87,11 @@ def write_groupe(path,groupe,numGroup):
     try:
         with open(path, 'w', encoding='utf-8') as f:
             json.dump(groupe, f, indent=4, ensure_ascii=False)
-        print(f"fichier json écrit avec succès dans '{path}'.")
+        print(f"fichier json écrit avec succès dans '{path}'.\n")
     except IOError as e:
-        print(f"Erreur d'écriture dans le fichier '{path}' : {e}")
+        print(f"Erreur d'écriture dans le fichier '{path}' : {e}\n")
     except Exception as e:
-        print(f"Une erreur inattendue est survenue : {e}")
+        print(f"Une erreur inattendue est survenue : {e}\n")
           
 ############### NEXT.PY
 def write_next(pathDestination) :
@@ -119,22 +121,22 @@ def write_next(pathDestination) :
         print(f"Erreur écriture du next.py : Une erreur est survenue lors de la copie du fichier (écriture): {e}")
 
 ############### MAIN.PLA
-def copy_pla_default(pathPLADirectory):
+def copy_pla_default(pathOutput):
     """
-    copie les fichiers main.pla et readme.md dans le dossier output/PLA qui vient d'être créé
+    copie les fichiers main.pla et readme.md dans le dossier output/ qui vient d'être créé
 
-    parametre:
-    - chemin vers le dossier en cours de création dans output/PLA
+    paramètre:
+    - chemin vers le dossier en cours de création dans output
     """
     pathMain = "./default/pla/main.pla"
     pathReadme = "./default/pla/readme.md"
     try:
-        shutil.copy2(pathMain, os.path.join(pathPLADirectory, 'main.pla'))
-        print(f"'main.pla' copié avec succès vers '{pathPLADirectory}'.")
+        shutil.copy2(pathMain, os.path.join(pathOutput, 'main.pla'))
+        print(f"'main.pla' copié avec succès vers '{pathOutput}'.")
 
         # Copie readme.md
-        shutil.copy2(pathReadme, os.path.join(pathPLADirectory,'readme.md'))
-        print(f"'readme.md' copié avec succès vers '{pathPLADirectory}'.")
+        shutil.copy2(pathReadme, os.path.join(pathOutput,'readme.md'))
+        print(f"'readme.md' copié avec succès vers '{pathOutput}'.")
 
     except FileNotFoundError:
         print(f"Erreur : Un des fichiers source ('{pathMain}' ou '{pathReadme}') n'a pas été trouvé.", file=sys.stderr)
@@ -145,9 +147,10 @@ def copy_pla_default(pathPLADirectory):
 ############### ZIP
 def create_relative_zip_and_cleanup(source_dir, output_zip_path):
     """
-    Args:
-        source_dir (str): Le chemin du dossier à ziper (ex: 'Exo').
-        output_zip_path (str): Le chemin complet du fichier ZIP à créer (ex: 'Exo_content.zip').
+    créer un zip pour l'activité 
+    paramètres:
+    - chemin du dossier a zip
+    - nom du fichier zip
     """
     if not os.path.isdir(source_dir):
         print(f"Erreur : Le dossier source '{source_dir}' n'existe pas.")
