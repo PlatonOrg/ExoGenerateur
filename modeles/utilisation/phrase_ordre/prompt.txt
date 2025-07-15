@@ -1,4 +1,4 @@
-Génère un exercice de "remise en ordre de mots" où l'utilisateur doit reconstruire des phrases à partir d'une liste de mots désordonnés.
+Génère un exercice de "remise en ordre de mots" où l'utilisateur doit reconstruire des phrases à partir d'une liste de mots désordonnés, en sélectionnant parfois uniquement les mots pertinents.
 
 Ton objectif est de créer un JSON qui suit STRICTEMENT le format ci-dessous.
 
@@ -6,7 +6,7 @@ Le JSON généré doit inclure :
 
     - title (chaîne de caractères) : Un titre court et pertinent pour l'exercice. Ce titre doit être rédigé dans la langue spécifiée par langueInst et refléter le contenu ou le type de l'exercice (par exemple : "Remettez les mots dans l'ordre", "Construisez la phrase", "Ordre des mots et vocabulaire").
 
-    - instructions (chaîne de caractères) : Des instructions claires et conviviales pour l'utilisateur. Ces instructions doivent être rédigées dans la langue spécifiée par langueInst dans les informations supplémentaires du prompt principal. Elles doivent clairement énoncer l'objectif de l'exercice (par exemple : "Remettez les mots dans le bon ordre pour former une phrase correcte.", "Reconstruisez la phrase en arrangeant les mots donnés.", "Triez les mots pour former une phrase cohérente."). Il est impératif de NE PAS décrire la méthode d'interaction (par exemple : "Faites glisser...", "Cliquez ici...", "Tapez votre réponse...").
+    - instructions (chaîne de caractères) : Des instructions claires et conviviales pour l'utilisateur. Ces instructions doivent être rédigées dans la langue spécifiée par langueInst dans les informations supplémentaires du prompt principal. Elles doivent clairement énoncer l'objectif de l'exercice (par exemple : "Remettez les mots dans le bon ordre pour former une phrase correcte.", "Reconstruisez la phrase en arrangeant les mots donnés.", "Choisissez les bons mots et remettez-les dans le bon ordre pour former une phrase correcte.", "Triez les mots nécessaires pour former une phrase cohérente."). Il est impératif de NE PAS décrire la méthode d'interaction (par exemple : "Faites glisser...", "Cliquez ici...", "Tapez votre réponse...").
 
     - questions (liste d'objets) : Cette liste contiendra les phrases à reconstruire. Il est impératif que tu génères une question pour CHAQUE terme présent dans le glossaire que je te fournis. Chaque objet dans cette liste doit avoir les clés suivantes :
 
@@ -16,7 +16,7 @@ Le JSON généré doit inclure :
 
         - correct_sentence (liste de chaînes de caractères) : La phrase complète et correcte, décomposée en une liste de mots dans l'ordre, avec la ponctuation attachée aux mots appropriés. La ponctuation DOIT être directement accolée au mot qu'elle suit, sans espace intermédiaire (ex: "mot.", "mot,").
 
-        - distractor_words (liste de chaînes de caractères) : **(NOUVEAU CHAMP OPTIONNEL)** Une liste des mots pièges qui ont été ajoutés à `scrambled_words` mais qui ne font pas partie de `correct_sentence`. Ce champ ne DOIT être présent que si des mots pièges sont inclus.
+        - distractor_words (liste de chaînes de caractères) : **(CHAMP OPTIONNEL)** Une liste des mots pièges qui ont été ajoutés à `scrambled_words` mais qui ne font pas partie de `correct_sentence`. Ce champ ne DOIT être présent que si des mots pièges sont inclus.
 
 Contraintes supplémentaires pour les phrases :
 
@@ -29,21 +29,21 @@ Contraintes supplémentaires pour les phrases :
     - Le nombre total de mots dans `correct_sentence` (c'est-à-dire la longueur de la phrase correcte) ne doit JAMAIS dépasser 10 mots.
     
     - Pour les mots pièges (`distractor_words`) :
+        - **Critère Éliminatoire Strict :** Les mots pièges ne doivent **JAMAIS** permettre, seuls ou en combinaison avec n'importe quel sous-ensemble des mots de `correct_sentence`, de former une autre phrase grammaticalement correcte et sémantiquement logique ou plausible dans la langue cible. Ils doivent rester des éléments "hors sujet".
         - Les mots pièges DOIVENT être sémantiquement ou grammaticalement éloignés du contexte de la phrase correcte pour rester "distinguables" et ne pas être facilement confondu avec un mot nécessaire à la construction de la phrase.
-        - Ils peuvent être des noms communs, des verbes, des adjectifs, etc., mais ne doivent pas être des pronoms sujets (ex: "he", "she", "it", "they", "il", "elle") ou des conjonctions (ex: "et", "ou", "mais") qui pourraient créer des ambiguïtés ou des phrases grammaticalement valides mais sémantiquement incorrectes.
-        - La traduction du mot (depuis le glossaire) peut être utilisée comme inspiration pour un mot piège, à condition qu'il réponde aux critères ci-dessus (sémantiquement éloigné et non un pronom/conjonction).
-        - Le nombre de mots pièges par question doit être de 1 ou 2 au maximum.
+        - Ils peuvent être des noms communs, des verbes, des adjectifs, etc., mais ne doivent pas être des pronoms sujets (ex: "he", "she", "it", "they", "il", "elle") ou des conjonctions (ex: "et", "ou", "mais") qui pourraient créer des ambiguïtés ou des phrases grammaticalement valides mais sémantiquement incorrectes si combinés de manière inattendue.
+        - La traduction du mot (depuis le glossaire) peut être utilisée comme inspiration pour un mot piège, à condition qu'il réponde aux critères ci-dessus (sémantiquement et grammaticalement éloigné).
+        - **Le nombre de mots pièges par question doit être de 1 ou 2 au maximum, AVEC LA RÈGLE SUPPLÉMENTAIRE SUIVANTE : si la `correct_sentence` contient 5 mots ou moins, le nombre de mots pièges ne doit pas dépasser 1.**
         - Les mots pièges ne doivent PAS faire partie de `correct_sentence`.
-        - **Les mots pièges ne doivent PAS être des mots qui, en étant combinés avec n'importe quelle partie des mots de `correct_sentence`, pourraient former une autre phrase grammaticalement correcte et sémantiquement cohérente.**
 
-    - Les listes `scrambled_words` et `correct_sentence` doivent contenir STRICTEMENT les mêmes mots nécessaires à la phrase, avec la MÊME ORTHOGRAPHE exacte, y compris la casse (maj majuscules/minuscules) et la ponctuation attachée. La liste `scrambled_words` doit être une version désordonnée de `correct_sentence` **PLUS les éventuels mots pièges**.
+    - Les listes `scrambled_words` et `correct_sentence` doivent contenir STRICTEMENT les mêmes mots nécessaires à la phrase, avec la MÊME ORTHOGRAPHE exacte, y compris la casse (majuscules/minuscules) et la ponctuation attachée. La liste `scrambled_words` doit être une version désordonnée de `correct_sentence` **PLUS les éventuels mots pièges**.
 
 Exemple du format JSON attendu (adapte les termes et phrases aux données réelles de ton glossaire) :
 
 ```json
 {
     "title": "Anglais : Reconstruisez les phrases",
-    "instructions": "Remettez les mots dans le bon ordre pour former une phrase correcte.",
+    "instructions": "Remettez les mots dans le bon ordre pour former une phrase correcte. Attention : certains mots peuvent être des intrus et ne pas faire partie de la phrase finale.",
     "questions": [
         {
             "term": "Hello",
@@ -59,9 +59,9 @@ Exemple du format JSON attendu (adapte les termes et phrases aux données réell
         },
         {
             "term": "travel",
-            "scrambled_words": ["explore", "new", "to", "and", "countries.", "I", "love", "travel", "book", "imagine"],
+            "scrambled_words": ["explore", "new", "to", "and", "countries.", "I", "love", "travel", "elephant", "bicycle"],
             "correct_sentence": ["I", "love", "to", "travel", "and", "explore", "new", "countries."],
-            "distractor_words": ["book", "imagine"]
+            "distractor_words": ["elephant", "bicycle"]
         },
         {
             "term": "speak",
