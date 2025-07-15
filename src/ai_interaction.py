@@ -58,8 +58,9 @@ def ask_gemini(prompt):
         return ""
 
     try:
+        print("Une requête à l'ia est en cours de traitement")
         reponseBrut = IA_MODEL.generate_content(prompt)
-
+        
         if reponseBrut and reponseBrut.text:
             reponse = reponseBrut.text.strip()
 
@@ -229,12 +230,13 @@ def create_folder(newFolder):
         print(f"Erreur inattendue lors de la création du dossier : {e}", file=sys.stderr)
     return False
 
-def create_dated_output_folder(name):
+def create_dated_output_folder(name, generateGlossaire=False):
     """
     créer un dossier de type [name]_[timestamp] pour y mettre toutes les données des exercices
 
     paramètre
     - nom à donner au dossier avant le timestamp
+    - boolean True pour la génération d'un glossaire, False pour la génération d'une activité 
     """
     directory2 = "./output"
     os.makedirs(directory2, exist_ok=True)
@@ -246,6 +248,10 @@ def create_dated_output_folder(name):
     newFolderPLA = os.path.join(directory2, folderName)
     if not create_folder(newFolderPLA) :
         return ""
+    
+    if generateGlossaire:
+        return newFolderPLA
+    
     if not create_folder(newFolderPLA+"/includes") :
         return ""
     return newFolderPLA
@@ -393,7 +399,7 @@ def generate_data(glossaire, generalInfo):
     basePrompt = generalPrompt(glossaire, generalInfo)
     print("Prompt général complété.")
 
-    pathPLADirectory = create_dated_output_folder('Exercice')
+    pathPLADirectory = create_dated_output_folder('Activite')
     if pathPLADirectory == "":
         return # erreur création des dossiers
 

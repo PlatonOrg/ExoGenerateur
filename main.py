@@ -4,6 +4,8 @@ fichier principal
 
 import os
 import sys
+import time
+
 
 from src.ai_interaction import create_dated_output_folder, generate_data, generate_glossaire, init_ia
 from src.user_interaction import ask_general_info,get_glossaire
@@ -91,9 +93,24 @@ def display_help():
     print("  help                               - Affiche les commandes.")
     print("-------------------------------------------------------------------------------")    
 
+def isTimeOK(last_request,isPLA = False):
+    """
+    Le nombre de requête à  l'ia est limiter à 15 par minutes
+    - timestamp de la derniére requête
+    - boolean True si on génére une activité, False si c'est juste un glossaire
+    """
+    timeToWait = 60
+    if isPLA :
+        timeToWait = 20
+    if time.time() - last_request < timeToWait:
+        print(f"Merci de patienter encore {timeToWait - (time.time() - last_request)} secondes. (le nombre de requêtes par minutes à l'ia est limité)")
+        return False
+    return True
+
 if __name__ == "__main__":
     display_help()
     init_ia()
+    last_request = 0
     while True:
         try:
             ligneDeCommande = input("saisir commande: ").strip()
@@ -103,11 +120,11 @@ if __name__ == "__main__":
             commande = partie[0]
             if commande == "addExercice":
                 if len(partie) < 2:
-                    print("Erreur: Nom de dossier manquant. Utilisation : generate <nom_du_dossier>")
+                    print("Erreur: Nom de dossier manquant. Utilisation : addExercice <nom_de_l_exercice>")
                 else:
                     nomDossier = partie[1]
-                    if not nomDossier.replace('_', '').replace('-', '').isalnum() and False:
-                        print("Erreur: Nom de dossier invalide. Utilisez des caractères alphanumériques, des tirets ou des tirets bas.")
+                    if not nomDossier.replace('_', ''):
+                        print("Erreur: Nom de dossier invalide. Utilisez des caractères alphanumériques, des tirets, des tirets bas ou des barres obligue.")
                     else:
                         create_component_folder(nomDossier)
             elif commande == "exit":
@@ -117,19 +134,21 @@ if __name__ == "__main__":
                 display_help()
 
             elif commande == "glossaire":
-                infoGeneralPrompt = ask_general_info()
-                glossaire = generate_glossaire(infoGeneralPrompt)
-                print("glossaire généré")
-                pathDirectory = create_dated_output_folder('Exercice')
-                os.makedirs(pathDirectory + '/data', exist_ok=True)
-                with open(pathDirectory + '/data/glossaire.txt', 'w', encoding='utf-8') as f:
-                    f.write(glossaire)
+                if isTimeOK(last_request):
+                    infoGeneralPrompt = ask_general_info()
+                    glossaire = generate_glossaire(infoGeneralPrompt,True)
+                    pathDirectory = create_dated_output_folder('Glossaire')
+                    with open(pathDirectory + 'glossaire.json', 'w', encoding='utf-8') as f:
+                        f.write(glossaire)
+                    print("glossaire généré dans {pathDirectory}")
 
             elif commande == "generate":
-                infoGeneralPrompt = ask_general_info()
-                glossaire = get_glossaire(infoGeneralPrompt)
-                print("glossaire généré")
-                generate_data(glossaire,infoGeneralPrompt)
+                if isTimeOK(last_request,True):
+                    last_request = time.time()
+                    infoGeneralPrompt = ask_general_info()
+                    glossaire = get_glossaire(infoGeneralPrompt)
+                    print("glossaire généré")
+                    generate_data(glossaire,infoGeneralPrompt)
                 
             else:
                 print(f"commande inconnue: '{commande}'. Utilisez help pour plus d'information")
