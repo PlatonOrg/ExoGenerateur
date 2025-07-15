@@ -1,13 +1,26 @@
 from random import shuffle, randint
+import time
 import json
 
+previousId = getPreviousExerciseId()
+if previousId : # bloque le bouton ->
+    playIfUnplayed(previousId)
 
 ############ LOAD VARIABLE
+timer = 780 # 13 * 60
 
 stat = load("stat",{})
 
 indexGroup = load("indexGroup",0)
 indexUnique = load("indexUnique",0)
+
+startTime = load("startTime",time.time())
+
+if time.time() - startTime > timer :
+  startTime = time.time()
+  save("startTime",startTime)
+  save("indexUnique", indexUnique + 1)
+  generateAndPlayExercise(getExerciseId(0,1), {"":indexUnique})
 
 size = 5
 originalGlossaire = []
@@ -28,48 +41,50 @@ elif indexGroup == 2:
 elif indexGroup == 3:
   groupe = json.load(open('includes/utilisation.json','r'))
 
-
-
 # met à jour les données de stat
-previousId = getPreviousExerciseId()
 if previousId :
   exoData = getExerciseVariable(previousId,"stat")
   previousGroup = 3 if indexGroup == 0 else indexGroup - 1
 
-  if exoData is not {}:
-    for key in exoData.keys():
-      if previousGroup == 0 :
-        element = stat.get(key,{})
-        if element == {} :
-          stat[key] = {
-            "definition": [exoData[key],1], 
-            "traduction":[0,0],
-            "utilisation":[0,0]
-          }
-        else :
-          stat[key]["definition"] = [stat[key]["definition"][0] + exoData[key],stat[key]["definition"][1] + 1]
+  choix = getExerciseVariable(previousId,"choix")
+  if choix is not None:
+    if choix == "Arrêter":
+      stopActivity()
+  else :
+    if exoData is not {}:
+      for key in exoData.keys():
+        if previousGroup == 0 :
+          element = stat.get(key,{})
+          if element == {} :
+            stat[key] = {
+              "definition": [exoData[key],1], 
+              "traduction":[0,0],
+              "utilisation":[0,0]
+            }
+          else :
+            stat[key]["definition"] = [stat[key]["definition"][0] + exoData[key],stat[key]["definition"][1] + 1]
 
-      elif previousGroup == 1:
-        element = stat.get(key,{})
-        if element == {} :
-          stat[key] = {
-            "definition": [0,0], 
-            "traduction":[exoData[key],1],
-            "utilisation":[0,0]
-          }
-        else :
-          stat[key]["traduction"] = [stat[key]["traduction"][0] + exoData[key],stat[key]["traduction"][1] + 1]
+        elif previousGroup == 1:
+          element = stat.get(key,{})
+          if element == {} :
+            stat[key] = {
+              "definition": [0,0], 
+              "traduction":[exoData[key],1],
+              "utilisation":[0,0]
+            }
+          else :
+            stat[key]["traduction"] = [stat[key]["traduction"][0] + exoData[key],stat[key]["traduction"][1] + 1]
 
-      else :
-        element = stat.get(key,{})
-        if element == {} :
-          stat[key] = {
-            "definition": [0,0],
-            "traduction":[0,0],
-            "utilisation":[exoData[key],1]
-          }
         else :
-          stat[key]["utilisation"] = [stat[key]["utilisation"][0] + exoData[key],stat[key]["utilisation"][1] + 1]
+          element = stat.get(key,{})
+          if element == {} :
+            stat[key] = {
+              "definition": [0,0],
+              "traduction":[0,0],
+              "utilisation":[exoData[key],1]
+            }
+          else :
+            stat[key]["utilisation"] = [stat[key]["utilisation"][0] + exoData[key],stat[key]["utilisation"][1] + 1]
 
 ############ FUNCTION
 
@@ -80,7 +95,6 @@ def next_data_save(groupe,strIndexGroup, glossaireExo, size):
   """
   # prends un exercice 
   ExoNumber = 0
-
   # pour le ExoNumber
   exerciceData = {
       "title" : groupe[ExoNumber]['exercice']['title'],
@@ -129,7 +143,7 @@ def next_data(groupe,strIndexGroup, glossaireExo, size):
       if size == count:
           break
 
-  if len(exerciceData["questions"]) == 0: # il n'y a pas de question, ont tente de charger le premier exercice du groupe est, on prie pour qu'il y ait des questions
+  if len(exerciceData["questions"]) <= 1: # il n'y a pas assez de question, ont tente de charger le premier exercice du groupe est, on prie pour qu'il y ait des questions
     return next_data_save(groupe,strIndexGroup, glossaireExo, size)
 
   return ExoNumber,exerciceData
@@ -226,7 +240,6 @@ def get_small_glossaire(glossaireExo, originalGlossaire):
   for terme in originalGlossaire:
     if terme["term"] in glossaireExo:
       smallGlossaire.append(terme)
-
   return smallGlossaire 
 
 
@@ -237,7 +250,7 @@ glossaireExo = get_glossaire(indexGroup,stat,originalGlossaire, size)
 save("indexGroup", indexGroup + 1)
 save("stat",stat)
 save("indexUnique", indexUnique + 1)
-
+save("startTime",startTime)
 if indexGroup == 0:
   exerciceData = get_small_glossaire(glossaireExo, originalGlossaire)
   generateAndPlayExercise(getExerciseId(0,0),{"data": exerciceData,"":indexUnique})
