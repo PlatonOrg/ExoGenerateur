@@ -30,16 +30,20 @@ if indexGroup > 3:
     indexGroup = 0
 
 if indexGroup == 0:
-  originalGlossaire = json.load(open('includes/glossaire.json','r'))
+  with open('includes/glossaire.json', 'r', encoding='utf-8') as f:
+      originalGlossaire = json.load(f)
 
 elif indexGroup == 1:
-  groupe = json.load(open('includes/definition.json','r'))
+  with open('includes/definition.json', 'r', encoding='utf-8') as f:
+    groupe = json.load(f)
 
 elif indexGroup == 2:
-  groupe = json.load(open('includes/traduction.json','r'))
+  with open('includes/traduction.json', 'r', encoding='utf-8') as f:
+    groupe = json.load(f)
 
 elif indexGroup == 3:
-  groupe = json.load(open('includes/utilisation.json','r'))
+  with open('includes/utilisation.json', 'r', encoding='utf-8') as f:
+    groupe = json.load(f)
 
 # met à jour les données de stat
 if previousId :
