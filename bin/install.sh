@@ -112,7 +112,7 @@ echo "$Green Dependencies installed successfully.$Color_Off"
 
 ---
 ### create local directory
-```bash
+
 echo "$Cyan"
 echo "Creating project directories '$OUTPUT_DIR' and '$LOCAL_FILE_DIR'..."
 echo "$Color_Off"
