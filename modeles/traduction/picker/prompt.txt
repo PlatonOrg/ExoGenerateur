@@ -18,11 +18,12 @@ Le JSON généré doit inclure :
         - options (liste de chaînes de caractères) : Une liste de 3 à 5 options de réponse, incluant la bonne réponse et des distracteurs plausibles.
             - Si la question est de Type 1 (Terme vers Traduction), les options et la correct_answer doivent être des traductions (en langueTraduction) provenant du glossaire.
             - Si la question est de Type 2 (Traduction vers Terme), les options et la correct_answer doivent être des termes (en langueDefinition) provenant du glossaire.
-            - Toutes les options (et la bonne réponse) DOIVENT être extraites directement et fidèlement des champs term ou translation du glossaire que je te fournis, sans modification ni paraphrase.
+            - Toutes les options (et la bonne réponse) DOIVENT être extraites directement et fidèlement des champs 'term' ou 'translation' du glossaire que je te fournis, **sans modification ni paraphrase. Si une traduction contient plusieurs mots ou des alternatives (ex: "voyage, excursion"), elle DOIT être traitée comme une seule option unique dans la liste 'options'.**
         - correct_answer (chaîne de caractères) : La chaîne exacte de l'option correcte parmi les options.
 
 Exemple du format JSON attendu (adapte les termes, traductions et options aux données réelles que tu me donnes) :
 
+```json
 {
     "title": "Quiz de Traduction",
     "instructions": "Sélectionnez la traduction correcte pour chaque terme, ou choisissez le terme qui correspond à la traduction.",
@@ -46,6 +47,16 @@ Exemple du format JSON attendu (adapte les termes, traductions et options aux do
                 "Goodbye"
             ],
             "correct_answer": "Hi"
+        },
+        {
+            "term": "trip",
+            "question_text": "Quelle est la traduction de 'trip' ?",
+            "options": [
+                "voyage, excursion",
+                "itinéraire",
+                "destination"
+            ],
+            "correct_answer": "voyage, excursion"
         },
         {
             "term": "My name is...",

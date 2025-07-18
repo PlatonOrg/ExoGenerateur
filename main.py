@@ -113,7 +113,7 @@ if __name__ == "__main__":
     last_request = 0
     while True:
         try:
-            ligneDeCommande = input("saisir commande: ").strip()
+            ligneDeCommande = input("saisir commande : ").strip()
             partie = ligneDeCommande.split(maxsplit=1) # sépare la commande de ses arguments
             if not partie:
                 continue

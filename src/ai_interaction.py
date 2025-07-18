@@ -58,9 +58,9 @@ def ask_gemini(prompt):
         return ""
 
     try:
-        print("Une requête à l'ia est en cours de traitement")
+        print("Une requête à l'ia est en cours de traitement : ", end="")
         reponseBrut = IA_MODEL.generate_content(prompt)
-        
+        print("réponse reçue")
         if reponseBrut and reponseBrut.text:
             reponse = reponseBrut.text.strip()
 
@@ -126,8 +126,10 @@ def generate_glossaire(infoGeneral):
 
     if infoGeneral["indicationSup"] is not None:
         sujet += " , indications supplémentaires : " + infoGeneral["indicationSup"]
-    langueDefinition = infoGeneral["matiere"]
-    langueTraduction = "Francais"
+    
+    langueDefinition = infoGeneral["matiere"] # Ex: "Anglais"
+    langueTraduction = "Francais" # Ex: "Francais"
+
     prompt = {
         "model": MODEL_TYPE,
         "messages": [
@@ -151,7 +153,9 @@ def generate_glossaire(infoGeneral):
 
                 2.  Une définition concise et claire, rédigée en {langueDefinition}.
                     ***CONTRAINTE DE DÉFINITION : La définition DOIT être simple à comprendre, complète, et ne DOIT PAS contenir le terme qu'elle définit afin d'éviter toute circularité et de garantir une explication autonome.***
-                3.  Des traductions pour ce terme. L'objet 'translation' DOIT toujours inclure les clés '{langueDefinition}' et '{langueTraduction}'. Si un terme est déjà dans l'une de ces langues, la valeur de sa traduction pour cette langue peut être le terme lui-même (si universellement reconnu) ou une chaîne vide. Pour les autres cas, fournis la traduction la plus courante et appropriée.
+                    ***RÈGLE ABSOLUE DE NUANCE ET DE DIVERSITÉ DES TRADUCTIONS : Si des termes sont sémantiquement très proches ou peuvent partager des traductions identiques dans la langue cible (ex: 'travel' et 'voyage' en Anglais se traduisant par 'voyage' en Français), tu DOIS ABSOLUMENT fournir des définitions et des traductions qui mettent en évidence leurs nuances spécifiques, contextes d'usage, ou différences subtiles. Chaque terme doit avoir une définition unique et, si possible, une traduction qui le distingue clairement des autres. Pour les cas de traductions identiques, ajoute une précision entre parenthèses dans la traduction pour forcer la distinction (ex: "voyage (déplacement général)" pour 'travel' et "voyage (longue durée, aventure)" pour 'journey'). C'est CRUCIAL pour la génération d'exercices de quiz ultérieurs.***
+
+                3.  Des traductions pour ce terme. L'objet 'translation' DOIT toujours inclure les clés '{langueDefinition}' et '{langueTraduction}'. Si un terme est déjà dans l'une de ces langues, la valeur de sa traduction pour cette langue peut être le terme lui-même (si universellement reconnu) ou une chaîne vide. Pour les autres cas, fournis la traduction la plus courante et appropriée, **en respectant strictement la RÈGLE ABSOLUE DE NUANCE ET DE DIVERSITÉ DES TRADUCTIONS mentionnée ci-dessus.**
 
                 Assure-toi que la sortie est un tableau JSON STRICTEMENT conforme au format spécifié, où chaque entrée représente un terme du glossaire. Maintiens une cohérence parfaite dans la structure des clés de l'objet 'translation' pour toutes les entrées. Concentre-toi sur les termes clés et les concepts fondamentaux du sujet.
                 """
@@ -179,11 +183,10 @@ def generate_glossaire(infoGeneral):
             }
         ],
         "response_format": { "type": "json_object" },
-        "temperature": 0.3 # Une température légèrement plus élevée peut aider à générer plus de termes variés, tout en restant structuré.
+        "temperature": 0.5 # J'ai légèrement augmenté la température pour encourager plus de créativité dans les nuances si nécessaire. Tu peux l'ajuster.
     }
 
     return ask_gemini(json.dumps(prompt))
-
 ######### prompt dans modeles
 
 def find_exo_prompt():
