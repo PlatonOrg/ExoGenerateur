@@ -45,6 +45,9 @@ python main.py
 
 You can now remove the ZIP file. If there's an issue in the "Exercices" section (e.g., no exercises have been added), try to close and reopen the editor.
 
+## Information
+- In "main.pla" keep all Actions disabled otherwise users may cheat (for "Autre question" and "Solution") or functionality are not implemented.
+
 
 # Technical documentation
 

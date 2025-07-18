@@ -3,7 +3,8 @@ import time
 import json
 
 previousId = getPreviousExerciseId()
-if previousId : # bloque le bouton ->
+if previousId : # bloque le bouton -> 
+    #garder Solution désactivé sinon on peut voir la solution cliquer sur -> et valider l'exercice
     playIfUnplayed(previousId)
 
 ############ LOAD VARIABLE

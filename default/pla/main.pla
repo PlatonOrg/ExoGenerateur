@@ -9,10 +9,10 @@
     },
     "actions": {
       "retry": 1,
-      "hints": true,
-      "reroll": true,
-      "theories": true,
-      "solution": true
+      "hints": false,
+      "reroll": false,
+      "theories": false,
+      "solution": false
     },
     "feedback": {
       "review": true,
