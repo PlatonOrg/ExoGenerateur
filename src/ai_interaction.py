@@ -12,7 +12,7 @@ from .write_file import copy_pla_default, create_relative_zip_and_cleanup, get_a
 
 GEMINI_API_KEY = None
 IA_MODEL = None
-MODEL_TYPE = 'gemini-1.5-flash'
+MODEL_TYPE = 'gemini-2.5-flash'
 
 ########## initialisation et requête
 
@@ -70,6 +70,7 @@ def ask_gemini(prompt):
             elif reponse.startswith('```') and reponse.endswith('```'): #juste '```'
                  return reponse[len('```\n'):-len('\n```')].strip()
             else:
+                print(f"Pas de balise {reponseBrut}")
                 return reponse # Pas de balises
         else:
             print(f"L'IA n'a pas pu générer une réponse textuelle valide. Raison(s) de blocage : {reponseBrut.prompt_feedback}", file=sys.stderr)
@@ -81,32 +82,96 @@ def ask_gemini(prompt):
 
 ######### glossaire
 
-def extract_glossaire(fileContent):
+def extract_glossaire(fileContent, infoGeneral):
     """
-    Extrait le glossaire à partir d'un texte
-    Renvoie la réponse de Gemini au format str
+    Extrait le glossaire à partir d'un texte en utilisant les règles strictes 
+    de formatage des termes, définitions et traductions. Le contexte est fourni par infoGeneral.
+    
+    paramètres:
+    - fileContent: le texte du fichier contenant le glossaire à extraire
+    - infoGeneral: Un dictionnaire contenant les informations contextuelles ('matiere', 'theme', 'indicationSup')
 
-    paramètre 
-    - le fichier contenant le glossaire à extraire
-
-    return 
-    - le glossaire
+    return: 
+    - le glossaire au format JSON (string)
     """
-    langueDefinition = "Anglais"
+    # Intégration de la logique de construction du sujet et des langues à partir de infoGeneral
+    # Utilisation de .get() pour gérer les clés "theme" et "indicationSup" manquantes sans erreur.
+    sujet = "matière : " + infoGeneral["matiere"]
+    if infoGeneral.get("theme") is not None:
+        sujet += " , thème : " + infoGeneral["theme"]
+
+    if infoGeneral.get("indicationSup") is not None:
+        sujet += " , indications supplémentaires : " + infoGeneral["indicationSup"]
+    
+    # Définition des langues basée sur infoGeneral et la langue de traduction fixée
+    langueDefinition = infoGeneral["matiere"] # Ex: "Anglais", basé sur la matière
+    langueTraduction = "Francais" # Fixé
+
+    # Instructions système détaillées pour assurer la cohérence et le formatage strict
+    system_instruction_content = f"""Tu es un expert linguistique et terminologue de renom, spécialisé dans l'extraction de glossaires techniques et conceptuels. Ton rôle est d'extraire un glossaire complet et précis à partir du texte fourni. Pour chaque terme pertinent que tu identifieras, tu devras fournir:
+                1.  Le terme lui-même.
+                    ***RÈGLE ABSOLUE POUR LE 'TERM' : Le 'term' doit être un unique mot de dictionnaire, ou un nom composé très court (maximum 2-3 mots si inséparable, comme "Artificial Intelligence"). AUCUNE phrase, AUCUNE question, AUCUNE réponse, AUCUNE expression verbale avec "to" + verbe + complément, AUCUNE expression idiomatique longue.***
+
+                    ***RÈGLE DE CASSE POUR LE 'TERM' : Le 'term' DOIT commencer par une MINUSCULE, sauf s'il s'agit d'un NOM PROPRE (ex: "France", "Paris") ou d'un ACRONYME (ex: "NATO", "AI"). Pour tout autre terme, y compris les noms communs ou composés, il DOIT commencer par une minuscule. N'utilise JAMAIS de majuscule pour un nom commun, même s'il apparaît en début de phrase dans une définition.***
+
+                    **ACCEPTE UNIQUEMENT LES TERMES DE CE TYPE ET CASSE :**
+                    * **Mots uniques (minuscule) :** "name", "hello", "hi", "greeting", "origin", "meet", "fine", "introduce", "travel", "speak", "locomotive", "age", etc.
+                    * **Noms propres (majuscule initiale) :** "France", "Paris", "Gemini".
+                    * **Acronymes (tout en majuscules) :** "NATO", "AI".
+                    * **Noms composés très courts (max 3 mots, formant un seul concept, minuscule initiale) :** "handshake", "thank you", "artificial intelligence", "decision-making", "user interface".
+
+                    **REJETTE ABSOLUMENT ET NE DOIS JAMAIS GÉNÉRER CES TYPES DE 'TERM' :**
+                    * **Phrases ou questions :** "My name is...", "How are you?", "I'm fine, thank you", "And you?", "Nice to meet you", "It's a pleasure to meet you", "Pleased to meet you".
+                    * **Expressions verbales longues ou avec compléments :** "To introduce oneself", "To meet someone", "Come from".
+
+                2.  Une définition concise et claire, rédigée en {langueDefinition}.
+                    ***CONTRAINTE DE DÉFINITION : La définition DOIT être simple à comprendre, complète, et ne DOIT PAS contenir le terme qu'elle définit afin d'éviter toute circularité et de garantir une explication autonome.***
+                    ***RÈGLE ABSOLUE DE NUANCE ET DE DIVERSITÉ DES TRADUCTIONS : Si des termes sont sémantiquement très proches ou peuvent partager des traductions identiques dans la langue cible (ex: 'travel' et 'voyage' en Anglais se traduisant par 'voyage' en Français), tu DOIS ABSOLUMENT fournir des définitions et des traductions qui mettent en évidence leurs nuances spécifiques, contextes d'usage, ou différences subtiles. Chaque terme doit avoir une définition unique et, si possible, une traduction qui le distingue clairement des autres. Pour les cas de traductions identiques, ajoute une précision entre parenthèses dans la traduction pour forcer la distinction (ex: "voyage (déplacement général)" pour 'travel' et "voyage (longue durée, aventure)" pour 'journey'). C'est CRUCIAL pour la génération d'exercices de quiz ultérieurs.***
+
+                3.  Des traductions pour ce terme. L'objet 'translation' DOIT toujours inclure les clés '{langueDefinition}' et '{langueTraduction}'. Si un terme est déjà dans l'une de ces langues, la valeur de sa traduction pour cette langue peut être le terme lui-même (si universellement reconnu) ou une chaîne vide. Pour les autres cas, fournis la traduction la plus courante et appropriée, **en respectant strictement la RÈGLE ABSOLUE DE NUANCE ET DE DIVERSITÉ DES TRADUCTIONS mentionnée ci-dessus.**
+
+                Assure-toi que la sortie est un tableau JSON STRICTEMENT conforme au format spécifié, où chaque entrée représente un terme du glossaire. Maintiens une cohérence parfaite dans la structure des clés de l'objet 'translation' pour toutes les entrées. Concentre-toi sur les termes clés et les concepts fondamentaux extraits du texte.
+                """
+
     prompt = {
         "model": MODEL_TYPE,
         "messages": [
             {
                 "role": "system",
-                "content": "Tu es un expert linguistique et terminologue. Ton rôle est d'extraire un glossaire complet à partir du texte fourni, en respectant le format JSON spécifié. Pour chaque terme, inclus une définition concise et, si pertinent, des traductions. La définition doit être dans la **" + langueDefinition + "**. L'objet 'translation' DOIT contenir une entrée pour le 'français' et une pour l''anglais'. Si le 'term' est déjà dans la langue de traduction spécifiée pour cet objet, tu peux laisser la valeur vide pour cette traduction ou répéter le 'term' si c'est un mot universellement reconnu. Sinon, fournis la traduction appropriée. Toutes les langues présentes dans l'objet 'translation' pour un terme DOIVENT être présentes dans l'objet 'translation' de TOUS les autres termes du glossaire, même si leur valeur est une chaîne vide."
+                "content": system_instruction_content
             },
             {
                 "role": "user",
-                "content": "Extrais un glossaire du texte suivant. La langue de définition souhaitée est le **" + langueDefinition + "**. Le format doit être:\n\n```json\n[\n    {\n        \"term\": \"\",\n        \"definition\": \"\",\n        \"translation\": {\"français\": \"\", \"anglais\": \"\"} \n    }\n]\n```\n\nVoici le texte du fichier:\n\n" + fileContent
+                "content": f"""Extrais un glossaire des termes clés trouvés dans le texte suivant, en respectant toutes les règles de formatage spécifiées dans les instructions système.
+
+    Le contexte de cette extraction est le suivant : "**{sujet}**".
+
+    La langue principale pour les définitions est le **{langueDefinition}**.
+
+    Le format de sortie DOIT être une liste JSON de dictionnaires, comme ceci :
+
+    ```json
+    [
+        {{
+            "term": "[Terme extrait (mot unique ou expression nominale max 3 mots, avec minuscule sauf nom propre/acronyme)]",
+            "definition": "[Définition du terme dans la langue souhaitée]",
+            "translation": {{
+                "{langueDefinition}": "[Terme en langue de définition, ou sa traduction]",
+                "{langueTraduction}": "[Traduction du terme dans la langue opposée, ou le terme si déjà dans cette langue)]"
+            }}
+        }},
+        // ... autres termes
+    ]
+    ```
+
+    Voici le texte à analyser :
+    
+    {fileContent}
+    """
             }
         ],
         "response_format": { "type": "json_object" },
-        "temperature": 0.1
+        "temperature": 0.1 
     }
     return ask_gemini(json.dumps(prompt))
 
@@ -183,7 +248,7 @@ def generate_glossaire(infoGeneral):
             }
         ],
         "response_format": { "type": "json_object" },
-        "temperature": 0.5 # J'ai légèrement augmenté la température pour encourager plus de créativité dans les nuances si nécessaire. Tu peux l'ajuster.
+        "temperature": 0.5
     }
 
     return ask_gemini(json.dumps(prompt))

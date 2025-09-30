@@ -136,11 +136,11 @@ if __name__ == "__main__":
             elif commande == "glossaire":
                 if isTimeOK(last_request):
                     infoGeneralPrompt = ask_general_info()
-                    glossaire = generate_glossaire(infoGeneralPrompt,True)
-                    pathDirectory = create_dated_output_folder('Glossaire')
-                    with open(pathDirectory + 'glossaire.json', 'w', encoding='utf-8') as f:
+                    glossaire = get_glossaire(infoGeneralPrompt)
+                    pathDirectory = create_dated_output_folder('Glossaire', True)
+                    with open(pathDirectory + '/glossaire.json', 'w', encoding='utf-8') as f:
                         f.write(glossaire)
-                    print("glossaire généré dans {pathDirectory}")
+                    print(f"glossaire généré dans {pathDirectory}")
 
             elif commande == "generate":
                 if isTimeOK(last_request,True):

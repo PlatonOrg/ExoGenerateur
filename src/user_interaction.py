@@ -3,7 +3,7 @@ Interaction avec l'utilisateur sur le terminal
 """
 import os
 
-from src.ai_interaction import generate_glossaire
+from src.ai_interaction import extract_glossaire, generate_glossaire
 
 
 
@@ -76,7 +76,7 @@ def get_data(type, infoGeneral):
             if not os.path.exists(path):
                 print(f"Erreur : le fichier '{path}' est introuvable")
             else :
-                return read_text_file(path)
+                return extract_glossaire(read_text_file(path), infoGeneral)
 
     if type == "generate" :
         return generate_glossaire(infoGeneral)
