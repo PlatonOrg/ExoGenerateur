@@ -1,0 +1,42 @@
+Génère un exercice de type "picker" où l'utilisateur doit choisir la définition correcte pour un terme donné, ou vice-versa, en utilisant les informations du glossaire fournies dans le corps de ma requête.
+
+Ton objectif est de créer un JSON qui suit STRICTEMENT le format ci-dessous.
+
+Le JSON généré doit inclure :
+
+    - title (chaîne de caractères) : Un titre court et pertinent pour l'exercice. Ce titre doit être rédigé dans la langue spécifiée par langueInst et refléter le contenu ou le type de l'exercice (par exemple : "Quiz de Vocabulaire", "Définitions à Choisir", "Termes Clés : Sélecteur").
+    - instructions (chaîne de caractères) : Des instructions claires et conviviales pour l'utilisateur qui fera l'exercice. Ces instructions doivent être rédigées dans la langue spécifiée par langueInst dans les informations supplémentaires du prompt principal. Les instructions doivent clairement énoncer l'objectif de l'exercice (par exemple : "Sélectionnez la bonne définition pour chaque terme.", "Choisissez le terme qui correspond à la définition.", "Trouvez la meilleure correspondance."). Il est impératif de NE PAS décrire la méthode d'interaction (par exemple : "Cliquez sur...", "Tapez votre réponse...", "Utilisez le menu déroulant...").
+    - questions (liste d'objets) : Cette liste contiendra les questions de l'exercice. Il est impératif que tu génères une question pour CHAQUE terme présent dans le glossaire que je te fournis. Pour chaque terme, tu devras alterner entre les deux formats de question possibles : "Quelle est la définition de [Terme] ?" et "Quel terme correspond à la définition : [Définition] ?". Chaque objet dans cette liste doit avoir les clés suivantes :
+        - term (chaîne de caractères) : Le terme exact du glossaire auquel cette question fait référence.
+        - question_text (chaîne de caractères) : Le texte de la question posée (par exemple : "Quelle est la définition de [Terme] ?", ou "Quel terme correspond à la définition : [Définition] ?"). La langue de la question doit être celle de langueInst.
+        - options (liste de chaînes de caractères) : Une liste de 3 à 5 options de réponse, incluant la bonne réponse et des distracteurs plausibles. Ces options doivent être dans la langue appropriée (termes dans la langue du terme, définitions dans la langue de définition).
+        - correct_answer (chaîne de caractères) : La chaîne exacte de l'option correcte parmi les options. Les term et definition utilisés dans les questions et les options DOIVENT être extraits directement et fidèlement des données du glossaire que je te fournis, sans modification ni paraphrase, sauf si le format de la question l'exige (par exemple : intégration dans une phrase).
+
+Exemple du format JSON attendu (adapte les termes, définitions et options aux données réelles que tu me donnes) :
+
+{
+    "title": "Quiz de Vocabulaire d'IA",
+    "instructions": "Sélectionnez la définition correcte pour chaque terme.",
+    "questions": [
+        {
+            "term": "Artificial Intelligence",
+            "question_text": "Quelle est la définition de 'Artificial Intelligence' ?",
+            "options": [
+                "A subfield of AI that enables systems to learn from data without being explicitly programmed.",
+                "A branch of computer science dealing with the simulation of intelligent behavior in computers.",
+                "A model inspired by the human brain, used in deep learning to process information."
+            ],
+            "correct_answer": "A branch of computer science dealing with the simulation of intelligent behavior in computers."
+        },
+        {
+            "term": "Machine Learning",
+            "question_text": "Quel terme correspond à la définition : 'A subfield of AI that enables systems to learn from data without being explicitly programmed.' ?",
+            "options": [
+                "Artificial Intelligence",
+                "Machine Learning",
+                "Neural Network"
+            ],
+            "correct_answer": "Machine Learning"
+        }
+    ]
+}

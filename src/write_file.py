@@ -10,7 +10,7 @@ import zipfile
 # nom du fichier sans le .json : liste des template pouvant être utiliser en fonction de sont groupe
 ALLOW_TEMPLATE = {
     # groupe definition
-    "definition_picker" : [0],
+    "definition_picker" : [0,4],
     "definition_emplacement" : [1],
     "definition_match" : [2,3],
 
@@ -23,7 +23,7 @@ ALLOW_TEMPLATE = {
     "utilisation_vrai_faux" : [6],
 
     # groupe traduction
-    "traduction_picker" : [0],
+    "traduction_picker" : [0,4],
     "traduction_match" : [1,2,3]
 }
 

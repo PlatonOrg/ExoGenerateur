@@ -62,14 +62,19 @@
           "resource": "badd9461-9f3a-4201-80b0-f2c43d391e72"
         },
         {
-          "id": "5acb8b8f-9714-45d0-b3ad-65dcb2e14ce9",
+          "id": "c03b2be8-fa91-4f97-9c2e-51bafe37bde3",
           "version": "latest",
-          "resource": "1251ca4d-915f-4271-a82b-9d38182841f9"
+          "resource": "dc3f551c-6888-4b91-a542-b87c5bfc244c"
         },
         {
           "id": "c1761cd0-076b-445d-84d3-15db4d61d22d",
           "version": "latest",
           "resource": "0085d062-031a-4b45-be2b-23c2a4fee487"
+        },
+        {
+          "id": "e30e2832-e0be-4157-9cb6-55794bdd08aa",
+          "version": "latest",
+          "resource": "5a1a554f-aa69-4d69-b50f-a521bd4a755b"
         }
       ]
     },
@@ -95,6 +100,11 @@
           "id": "4f4f8ed0-80b7-400a-bb95-8541969f055b",
           "version": "latest",
           "resource": "1251ca4d-915f-4271-a82b-9d38182841f9"
+        },
+        {
+          "id": "c846df71-ce58-4aef-8b52-45d878622d2a",
+          "version": "latest",
+          "resource": "5a1a554f-aa69-4d69-b50f-a521bd4a755b"
         }
       ]
     },
