@@ -8,15 +8,14 @@ if previousId : # bloque le bouton ->
     playIfUnplayed(previousId)
 
 ############ LOAD VARIABLE
-timer = 780 # 13 * 60
+timer = 300
 
 
-########### fait les exercices dans l'ordre du groupe si inorder = True
-inorder = True
+########### fait les exercices dans l'ordre du groupe si inOrder = True
+inOrder = False
 
 
 stat = load("stat",{})
-
 indexGroup = load("indexGroup",0)
 indexUnique = load("indexUnique",0)
 
@@ -63,38 +62,22 @@ if previousId :
   else :
     if exoData is not {}:
       for key in exoData.keys():
+
+        if stat.get(key,{}) == {} :
+          stat[key] = {
+            "definition": [0,0], 
+            "traduction":[0,0],
+            "utilisation":[0,0]
+          }
+
         if previousGroup == 0 :
-          element = stat.get(key,{})
-          if element == {} :
-            stat[key] = {
-              "definition": [exoData[key],1], 
-              "traduction":[0,0],
-              "utilisation":[0,0]
-            }
-          else :
-            stat[key]["definition"] = [stat[key]["definition"][0] + exoData[key],stat[key]["definition"][1] + 1]
+          stat[key]["definition"] = [stat[key]["definition"][0] + exoData[key],stat[key]["definition"][1] + 1]
 
         elif previousGroup == 1:
-          element = stat.get(key,{})
-          if element == {} :
-            stat[key] = {
-              "definition": [0,0], 
-              "traduction":[exoData[key],1],
-              "utilisation":[0,0]
-            }
-          else :
-            stat[key]["traduction"] = [stat[key]["traduction"][0] + exoData[key],stat[key]["traduction"][1] + 1]
+          stat[key]["traduction"] = [stat[key]["traduction"][0] + exoData[key],stat[key]["traduction"][1] + 1]
 
         else :
-          element = stat.get(key,{})
-          if element == {} :
-            stat[key] = {
-              "definition": [0,0],
-              "traduction":[0,0],
-              "utilisation":[exoData[key],1]
-            }
-          else :
-            stat[key]["utilisation"] = [stat[key]["utilisation"][0] + exoData[key],stat[key]["utilisation"][1] + 1]
+          stat[key]["utilisation"] = [stat[key]["utilisation"][0] + exoData[key],stat[key]["utilisation"][1] + 1]
 
 ############ FUNCTION
 
@@ -103,9 +86,7 @@ def next_data_save(groupe,strIndexGroup, glossaireExo, size):
   """
   derniere chance pour sauver l'activitée, charge l'exo 0 du groupe qui doit avoir tout les termes
   """
-  # prends un exercice 
-  ExoNumber = 0
-  # pour le ExoNumber
+  ExoNumber = 0  # prends un exercice 
   exerciceData = {
       "title" : groupe[ExoNumber]['exercice']['title'],
       "instructions" : groupe[ExoNumber]['exercice']['instructions'],
@@ -139,9 +120,10 @@ def next_data(groupe,strIndexGroup, glossaireExo, size):
   """
 
   # prends un exercice 
-  if inorder :
+  if inOrder :
     if strIndexGroup == "1" :
       ExoNumber = load("nextGroup1",0)
+      
       if ExoNumber >= len(groupe) :
         ExoNumber = 0
       save("nextGroup1", ExoNumber + 1)
@@ -161,7 +143,6 @@ def next_data(groupe,strIndexGroup, glossaireExo, size):
     
   else :
     ExoNumber = randint(0,len(groupe) - 1)
-
 
   # pour le ExoNumber
   exerciceData = groupe[ExoNumber]["exercice"].copy()
@@ -192,11 +173,16 @@ def get_know_list(stat):
   scoreDef = 1          # 2 exercices correcte sur la définition
   scoreTrad = 1         # 3 exercices correcte sur la traduction
   scoreUtilisation = 1  # 1 exercice correcte sur l'utilisation
+  limit = 9;
 
   dictionnaryScore = {}
   for key in stat.keys():
-    if stat[key]['definition'][0] < scoreDef or stat[key]['traduction'][0] < scoreTrad or stat[key]['utilisation'][0] < scoreUtilisation:
+
+    infLimite = (stat[key]['definition'][0] + stat[key]['traduction'][0] + stat[key]['utilisation'][0] ) <= limit
+
+    if (stat[key]['definition'][0] < scoreDef or stat[key]['traduction'][0] < scoreTrad or stat[key]['utilisation'][0] < scoreUtilisation ) and infLimite:
       dictionnaryScore[key] = stat[key]['definition'][1] + stat[key]['traduction'][1] + stat[key]['utilisation'][1]
+
   keys = sorted(dictionnaryScore.items(), key=lambda item: item[1])
   return [item[0] for item in keys]
 
@@ -209,29 +195,28 @@ def get_glossaire(indexGroup,stat,glossaire, size):
   if indexGroup == 0:
       # initialiser le glossaire
       if stat == {} :
-          # Selectionne les termes 
-          shuffle(glossaire)
+          shuffle(glossaire)# Selectionne les termes 
           glossaireExo =  [ element['term'] for element in glossaire[:size]]
       else :
         pasVue = []
-        knowList =  get_know_list(stat)
-        
+        glossaireStat =  get_know_list(stat)
+
         for element in glossaire:
-          if element['term'] not in knowList:
+          if element['term'] not in glossaireStat:
             pasVue.append(element['term'])
         
-        if pasVue == [] :
-          stopActivity()
-
         shuffle(pasVue)
-        shuffle(knowList)
+        shuffle(glossaireStat)
 
-        if len(pasVue) == 1:
-          glossaireExo = knowList[:4]
+        if len(pasVue) == 0:
+          stopActivity();
+
+        elif len(pasVue) == 1:
+          glossaireExo = glossaireStat[:4]
           glossaireExo.append(pasVue[0])
 
         else :
-          glossaireExo = knowList[:3]
+          glossaireExo = glossaireStat[:3]
           glossaireExo.extend(pasVue[:2])
 
   else :
@@ -252,8 +237,7 @@ def next_exercice(indexGroup,glossaireExo,groupe,size):
   - glossaire original avec tous les termes
   - liste des exercices répartie dans leur groupe
   """
-  # récupére un type d'exercice est les données nécessaires 
-  exoNumber,exerciceData = next_data(groupe,str(indexGroup), glossaireExo, size)
+  exoNumber,exerciceData = next_data(groupe,str(indexGroup), glossaireExo, size)  # récupére un type d'exercice est les données nécessaires 
 
   choixTemplate = randint(0,len(groupe[exoNumber]["template"]) -1)  # index dans la liste des templates
   templateNumber = groupe[exoNumber]['template'][choixTemplate]    # numéro du template choisis

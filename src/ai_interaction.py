@@ -385,7 +385,7 @@ def get_content(lstPrompt, index):
 
     paramètres
     - liste des emplacements de tous les prompts
-    - prompt à traiter dans la liste des prompts    
+    - index du prompt à traiter dans la liste des prompts    
     
     return
     - booleen True si erreur sinon False
