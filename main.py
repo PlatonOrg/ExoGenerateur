@@ -7,7 +7,7 @@ import sys
 import time
 
 
-from src.ai_interaction import create_dated_output_folder, generate_data, generate_glossaire, init_ia
+from src.ai_interaction import ask_gemini, create_dated_output_folder, generate_data, generate_glossaire, init_ia
 from src.user_interaction import ask_general_info,get_glossaire
 
 
@@ -149,7 +149,10 @@ if __name__ == "__main__":
                     glossaire = get_glossaire(infoGeneralPrompt)
                     print("glossaire généré")
                     generate_data(glossaire,infoGeneralPrompt)
-                
+            elif commande == "ask":
+                if isTimeOK(last_request):
+                    request = input()
+                    print(ask_gemini(request))
             else:
                 print(f"commande inconnue: '{commande}'. Utilisez help pour plus d'information")
 
