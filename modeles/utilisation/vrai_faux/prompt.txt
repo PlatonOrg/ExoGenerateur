@@ -44,7 +44,6 @@ Ces informations devront être fournies par l'utilisateur du prompt :
     "term": "probability",
     "definition": "The chance or likelihood of an event occurring. It's a numerical measure of uncertainty, ranging from 0 (impossible) to 1 (certain).",
     "translation": {
-      "Anglais": "probability",
       "Francais": "probabilité"
     }
   },
@@ -52,7 +51,6 @@ Ces informations devront être fournies par l'utilisateur du prompt :
     "term": "event",
     "definition": "An outcome or set of outcomes of a random phenomenon.",
     "translation": {
-      "Anglais": "event",
       "Francais": "événement"
     }
   }

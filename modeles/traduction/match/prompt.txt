@@ -14,9 +14,9 @@ Le JSON généré doit inclure :
 
         - match (chaîne de caractères) : La traduction exacte du terme correspondant. Les valeurs de term et match DOIVENT être extraites directement et fidèlement des données du glossaire que je te fournis, en utilisant le champ term pour le terme et le champ translation (en sélectionnant la langue cible appropriée, par exemple "Francais" si langueInst est le français) pour la traduction, sans modification ni paraphrase.
 
-        - correct_answer (chaîne de caractères) : La chaîne exacte du term (valeur identique à la clé term).
+        - correct_answer (liste de chaînes de caractères) : Une liste contenant le terme exact (celui du champ 'term') ainsi que tous les synonymes valides ou mots ayant le même sens dans la langue du terme. Tu dois enrichir cette liste en utilisant tes connaissances linguistiques pour inclure des variations acceptables. Par exemple, si le terme est "topic", la liste doit être ["topic", "subject", "theme"].
 
-Exemple du format JSON attendu (adapte les termes et traductions aux données réelles que je te donne, en utilisant le champ translation approprié) :
+Exemple du format JSON attendu (adapte les termes, traductions et synonymes aux données réelles que je te donne) :
 
 ```json
 {
@@ -26,17 +26,30 @@ Exemple du format JSON attendu (adapte les termes et traductions aux données r�
         {
             "term": "Rolling stock",
             "match": "Matériel roulant",
-            "correct_answer": "Rolling stock"
+            "correct_answer": [
+                "Rolling stock",
+                "Rolling-stock",
+                "Railway vehicles"
+            ]
         },
         {
             "term": "Locomotive",
             "match": "Locomotive",
-            "correct_answer": "Locomotive"
+            "correct_answer": [
+                "Locomotive",
+                "Engine",
+                "Train engine"
+            ]
         },
         {
             "term": "Passenger car",
             "match": "Voiture de voyageur",
-            "correct_answer": "Passenger car"
+            "correct_answer": [
+                "Passenger car",
+                "Coach",
+                "Carriage",
+                "Railway car"
+            ]
         }
     ]
 }

@@ -10,22 +10,41 @@ import zipfile
 # nom du fichier sans le .json : liste des template pouvant être utiliser en fonction de sont groupe
 ALLOW_TEMPLATE = {
     # groupe definition
-    "definition_picker" : [0,3],
-    "definition_emplacement" : [1],
-    "definition_match" : [2],
+    "definition_picker" : ["GR1 - proposition multiple","GR1 - choix unique"],
+    "definition_emplacement" : ["GR1 - trouver le mot"],
+    "definition_match" : ["GR1 - drag and drop"],
+    "definition_input" : ["GR1 - saisie de terme"],
 
     # groupe traduction
-    "traduction_picker" : [0,4],
-    "traduction_match" : [1,2,3],
+    "traduction_picker" : ["GR2 - proposition multiple","GR2 - choix unique"],
+    "traduction_match" : ["GR2 - drag and drop","GR2 - saisie de terme","GR2 - association rapide"],
 
 
     # groupe utilisation
-    "utilisation_synonyme" : [0,1],
-    "utilisation_phrase_trou_picker" : [2],
-    "utilisation_phrase_ordre" : [3],
-    #"utilisation_dialogue_theme_picker" : [4],
-    "utilisation_erreur" : [4],
-    "utilisation_vrai_faux" : [5]
+    "utilisation_synonyme" : ["GR3 - drag and drop","GR3 - association rapide"],
+    "utilisation_phrase_trou_picker" : ["GR3 - phrase à troue"],
+    "utilisation_phrase_ordre" : ["GR3 - ordre des mots"],
+    "utilisation_erreur" : ["GR3 - trouver l'erreur"],
+    "utilisation_vrai_faux" : ["GR3 - vrai ou faux"]
+}
+
+ALLOW_TEMPLATE_VALUE = {
+    "GR1 - proposition multiple" : 0,
+    "GR1 - choix unique" : 3,
+    "GR1 - trouver le mot" : 1,
+    "GR1 - drag and drop" : 2,
+    "GR1 - saisie de terme": 4,
+    "GR2 - proposition multiple" : 0,
+    "GR2 - choix unique" : 4,
+    "GR2 - drag and drop" : 1,
+    "GR2 - saisie de terme": 2,
+    "GR2 - association rapide":3,
+    "GR3 - drag and drop" : 0,
+    "GR3 - association rapide":1,
+    "GR3 - phrase à troue":2,
+    "GR3 - ordre des mots" : 3,
+    "GR3 - trouver l'erreur" : 4,
+    "GR3 - vrai ou faux" : 5
 }
 
 ############### /INCLUDES
@@ -162,7 +181,7 @@ def create_relative_zip_and_cleanup(source_dir, output_zip_path):
             for root, dirs, files in os.walk(source_dir):
                 relative_path_in_zip = os.path.relpath(root, source_dir)
 
-                if relative_path_in_zip != '.': # '.' signifie le dossier source lui-même
+                if relative_path_in_zip != '.':
                     zipf.write(root, relative_path_in_zip)
 
                 for file_name in files:

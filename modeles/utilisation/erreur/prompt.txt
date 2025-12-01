@@ -69,7 +69,6 @@ Ces informations devront être fournies par l'utilisateur du prompt :
     "term": "probability",
     "definition": "The chance or likelihood of an event occurring. It's a numerical measure of uncertainty, ranging from 0 (impossible) to 1 (certain).",
     "translation": {
-      "Anglais": "probability",
       "Francais": "probabilité"
     }
   },
@@ -77,7 +76,6 @@ Ces informations devront être fournies par l'utilisateur du prompt :
     "term": "event",
     "definition": "An outcome or set of outcomes of a random phenomenon.",
     "translation": {
-      "Anglais": "event",
       "Francais": "événement"
     }
   },
@@ -85,7 +83,6 @@ Ces informations devront être fournies par l'utilisateur du prompt :
     "term": "random variable",
     "definition": "A variable whose value is a numerical outcome of a random phenomenon.",
     "translation": {
-      "Anglais": "random variable",
       "Francais": "variable aléatoire"
     }
   },
@@ -93,7 +90,6 @@ Ces informations devront être fournies par l'utilisateur du prompt :
     "term": "sample space",
     "definition": "The set of all possible outcomes of a random phenomenon.",
     "translation": {
-      "Anglais": "sample space",
       "Francais": "espace échantillonnal"
     }
   }

@@ -128,7 +128,7 @@ def extract_glossaire(fileContent, infoGeneral):
                     ***CONTRAINTE DE DÉFINITION : La définition DOIT être simple à comprendre, complète, et ne DOIT PAS contenir le terme qu'elle définit afin d'éviter toute circularité et de garantir une explication autonome.***
                     ***RÈGLE ABSOLUE DE NUANCE ET DE DIVERSITÉ DES TRADUCTIONS : Si des termes sont sémantiquement très proches ou peuvent partager des traductions identiques dans la langue cible (ex: 'travel' et 'voyage' en Anglais se traduisant par 'voyage' en Français), tu DOIS ABSOLUMENT fournir des définitions et des traductions qui mettent en évidence leurs nuances spécifiques, contextes d'usage, ou différences subtiles. Chaque terme doit avoir une définition unique et, si possible, une traduction qui le distingue clairement des autres. Pour les cas de traductions identiques, ajoute une précision entre parenthèses dans la traduction pour forcer la distinction (ex: "voyage (déplacement général)" pour 'travel' et "voyage (longue durée, aventure)" pour 'journey'). C'est CRUCIAL pour la génération d'exercices de quiz ultérieurs.***
 
-                3.  Des traductions pour ce terme. L'objet 'translation' DOIT toujours inclure les clés '{langueDefinition}' et '{langueTraduction}'. Si un terme est déjà dans l'une de ces langues, la valeur de sa traduction pour cette langue peut être le terme lui-même (si universellement reconnu) ou une chaîne vide. Pour les autres cas, fournis la traduction la plus courante et appropriée, **en respectant strictement la RÈGLE ABSOLUE DE NUANCE ET DE DIVERSITÉ DES TRADUCTIONS mentionnée ci-dessus.**
+                3.  Une traduction pour ce terme. L'objet 'translation' DOIT toujours inclure la clef '{langueTraduction}'.Fournis la traduction la plus courante et appropriée, **en respectant strictement la RÈGLE ABSOLUE DE NUANCE ET DE DIVERSITÉ DES TRADUCTIONS mentionnée ci-dessus.**
 
                 Assure-toi que la sortie est un tableau JSON STRICTEMENT conforme au format spécifié, où chaque entrée représente un terme du glossaire. Maintiens une cohérence parfaite dans la structure des clés de l'objet 'translation' pour toutes les entrées. Concentre-toi sur les termes clés et les concepts fondamentaux extraits du texte.
                 """
@@ -155,9 +155,10 @@ def extract_glossaire(fileContent, infoGeneral):
         {{
             "term": "[Terme extrait (mot unique ou expression nominale max 3 mots, avec minuscule sauf nom propre/acronyme)]",
             "definition": "[Définition du terme dans la langue souhaitée]",
+            "category" : "[À remplir uniquement si le document mentionne la catégorie sinon mettre  : "" ]",
+            "part_of_speech" : "indique le type de terme : pronom, adjectif, verbe, ... ",
             "translation": {{
-                "{langueDefinition}": "[Terme en langue de définition, ou sa traduction]",
-                "{langueTraduction}": "[Traduction du terme dans la langue opposée, ou le terme si déjà dans cette langue)]"
+                "{langueTraduction}": "[Traduction du terme dans la langue opposée]"
             }}
         }},
         // ... autres termes
@@ -220,7 +221,7 @@ def generate_glossaire(infoGeneral):
                     ***CONTRAINTE DE DÉFINITION : La définition DOIT être simple à comprendre, complète, et ne DOIT PAS contenir le terme qu'elle définit afin d'éviter toute circularité et de garantir une explication autonome.***
                     ***RÈGLE ABSOLUE DE NUANCE ET DE DIVERSITÉ DES TRADUCTIONS : Si des termes sont sémantiquement très proches ou peuvent partager des traductions identiques dans la langue cible (ex: 'travel' et 'voyage' en Anglais se traduisant par 'voyage' en Français), tu DOIS ABSOLUMENT fournir des définitions et des traductions qui mettent en évidence leurs nuances spécifiques, contextes d'usage, ou différences subtiles. Chaque terme doit avoir une définition unique et, si possible, une traduction qui le distingue clairement des autres. Pour les cas de traductions identiques, ajoute une précision entre parenthèses dans la traduction pour forcer la distinction (ex: "voyage (déplacement général)" pour 'travel' et "voyage (longue durée, aventure)" pour 'journey'). C'est CRUCIAL pour la génération d'exercices de quiz ultérieurs.***
 
-                3.  Des traductions pour ce terme. L'objet 'translation' DOIT toujours inclure les clés '{langueDefinition}' et '{langueTraduction}'. Si un terme est déjà dans l'une de ces langues, la valeur de sa traduction pour cette langue peut être le terme lui-même (si universellement reconnu) ou une chaîne vide. Pour les autres cas, fournis la traduction la plus courante et appropriée, **en respectant strictement la RÈGLE ABSOLUE DE NUANCE ET DE DIVERSITÉ DES TRADUCTIONS mentionnée ci-dessus.**
+                3.  Une traduction pour ce terme. L'objet 'translation' DOIT toujours inclure la clef '{langueTraduction}'.Fournis la traduction la plus courante et appropriée, **en respectant strictement la RÈGLE ABSOLUE DE NUANCE ET DE DIVERSITÉ DES TRADUCTIONS mentionnée ci-dessus.**
 
                 Assure-toi que la sortie est un tableau JSON STRICTEMENT conforme au format spécifié, où chaque entrée représente un terme du glossaire. Maintiens une cohérence parfaite dans la structure des clés de l'objet 'translation' pour toutes les entrées. Concentre-toi sur les termes clés et les concepts fondamentaux du sujet.
                 """
@@ -237,9 +238,10 @@ def generate_glossaire(infoGeneral):
         {{
             "term": "[Terme généré (mot unique ou expression nominale max 3 mots, avec minuscule sauf nom propre/acronyme)]",
             "definition": "[Définition du terme dans la langue souhaitée]",
+            "category" : "[thème auquel le terme se rapproche exemple mauvais ami, entreprise,mots de tous les jours, ... category doit être dans la langue de {langueTraduction}]",
+            "part_of_speech" : "[indique le type de terme : pronom, adjectif, verbe, ... ]",
             "translation": {{
-                "{langueDefinition}": "[Terme en langue de définition, ou sa traduction]",
-                "{langueTraduction}": "[Traduction du terme dans la langue opposée, ou le terme si déjà dans cette langue)]"
+                "{langueTraduction}": "[Traduction du terme dans la langue opposée)]"
             }}
         }},
         // ... autres termes

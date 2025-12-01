@@ -1,0 +1,56 @@
+Génère un exercice de saisie (texte à trous ou réponse libre) où l'utilisateur doit retrouver le terme exact (ou un synonyme valide) d'après sa définition, en utilisant les informations du glossaire fournies dans le corps de ma requête.
+
+Ton objectif est de créer un JSON qui suit STRICTEMENT le format ci-dessous.
+
+Le JSON généré doit inclure :
+
+    - title (chaîne de caractères) : Un titre court et pertinent pour l'exercice. Ce titre doit être rédigé dans la langue spécifiée par langueInst et refléter le contenu ou le type de l'exercice (par exemple : "Vocabulaire : Définition et Terme", "Trouver le Concept", "Saisir d'après la Définition"). **Il est impératif que ce titre NE MENTIONNE PAS les langues spécifiques de l'exercice.**
+
+    - instructions (chaîne de caractères) : Des instructions claires et conviviales pour l'utilisateur. Ces instructions doivent être rédigées dans la langue spécifiée par langueInst. Elles doivent clairement énoncer l'objectif de l'exercice (par exemple : "Lisez la définition et saisissez le terme correspondant du glossaire.", "Trouvez le concept exact décrit par la définition.", "Quel terme décrit cette définition ?"). Il est impératif de NE PAS décrire la méthode d'interaction.
+
+    - questions (liste d'objets) : Cette liste contiendra les questions de l'exercice. Il est impératif que tu génères une question pour CHAQUE terme présent dans le glossaire que je te fournis. Chaque objet dans cette liste doit avoir les clés suivantes :
+
+        - term (chaîne de caractères) : Le terme exact du glossaire (à titre de référence interne, pour savoir quel terme est la base de la question).
+
+        - match (chaîne de caractères) : La définition exacte du 'term' telle qu'elle est fournie dans le glossaire. Cette définition DOIT être extraite directement et fidèlement des données du glossaire que je te fournis (champ 'definition'), sans modification ni paraphrase. Cette valeur sert d'énoncé de la question.
+
+        - correct_answer (liste de chaînes de caractères) : Une liste de chaînes de caractères qui contient le terme exact ('term') ainsi que **TOUS les synonymes, expressions ou termes strictement similaires pour lesquels la définition s'applique.** Tu dois enrichir cette liste en utilisant tes connaissances linguistiques pour fournir tous les termes acceptables par l'utilisateur. Le terme exact DOIT être la première entrée de cette liste. Par exemple, si le terme est "topic", la liste doit être ["topic", "subject", "theme"].
+
+Exemple du format JSON attendu (adapte les termes, définitions et synonymes aux données réelles de ton glossaire) :
+
+```json
+{
+    "title": "Saisir d'après la Définition",
+    "instructions": "Lisez la définition et saisissez le terme correspondant du glossaire.",
+    "questions": [
+        {
+            "term": "small talk",
+            "match": "Polite conversation about unimportant or uncontroversial matters, especially as engaged in on social occasions.",
+            "correct_answer": [
+                "small talk",
+                "chitchat",
+                "idle talk",
+                "pleasantries"
+            ]
+        },
+        {
+            "term": "travel",
+            "match": "To make a journey, typically of some length or abroad.",
+            "correct_answer": [
+                "travel",
+                "journey",
+                "trip",
+                "voyage"
+            ]
+        },
+        {
+            "term": "Locomotive",
+            "match": "A powered rail vehicle used for pulling trains.",
+            "correct_answer": [
+                "Locomotive",
+                "Engine",
+                "Train engine"
+            ]
+        }
+    ]
+}

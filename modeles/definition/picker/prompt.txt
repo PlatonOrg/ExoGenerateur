@@ -15,8 +15,7 @@ Le JSON généré doit inclure :
 Exemple du format JSON attendu (adapte les termes, définitions et options aux données réelles que tu me donnes) :
 
 {
-    "title": "Association Terme/Définition IA",
-    "instructions": "Sélectionnez le terme qui correspond à la définition.",
+p    "instructions": "Sélectionnez le terme qui correspond à la définition.",
     "questions": [
         {
             "term": "Machine Learning",
