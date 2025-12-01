@@ -8,7 +8,7 @@ import google.generativeai as genai
 
 from datetime import datetime
 from dotenv import load_dotenv
-from .write_file import copy_pla_default, create_relative_zip_and_cleanup, get_allow_template, get_groupe, write_next, write_glossaire, write_groupe
+from .write_file import copy_pla_default, create_zip, get_allow_template, get_groupe, write_next, write_glossaire, write_groupe
 
 GEMINI_API_KEY = None
 IA_MODEL = None
@@ -531,4 +531,4 @@ def generate_data(glossaire, generalInfo):
     write_next(pathNext_py)
     copy_pla_default(pathPLADirectory)
     print("\nfin de la génération des exercices\n")
-    create_relative_zip_and_cleanup(pathPLADirectory,pathPLADirectory + ".zip")
+    create_zip(pathPLADirectory,pathPLADirectory + ".zip")

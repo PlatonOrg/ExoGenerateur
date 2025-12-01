@@ -7,6 +7,7 @@ import sys
 import time
 
 
+from src.merge import merge
 from src.ai_interaction import ask_gemini, create_dated_output_folder, generate_data, generate_glossaire, init_ia
 from src.user_interaction import ask_general_info,get_glossaire
 
@@ -153,11 +154,14 @@ if __name__ == "__main__":
                 if isTimeOK(last_request):
                     request = input()
                     print(ask_gemini(request))
+            elif commande == "merge":
+                if isTimeOK(last_request):
+                    merge()
             else:
                 print(f"commande inconnue: '{commande}'. Utilisez help pour plus d'information")
 
-        except KeyboardInterrupt: # gére Ctrl+C
-            print() # saut de ligne à la fin du programme
+        except KeyboardInterrupt: # Ctrl+C
+            print() # new line in order to improve terminal display
             break
         except Exception as e:
             print(f"Erreur: {e}")

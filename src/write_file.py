@@ -165,7 +165,7 @@ def copy_pla_default(pathOutput):
 
 
 ############### ZIP
-def create_relative_zip_and_cleanup(source_dir, output_zip_path):
+def create_zip(source_dir, output_zip_path):
     """
     créer un zip pour l'activité 
     paramètres:
@@ -191,8 +191,8 @@ def create_relative_zip_and_cleanup(source_dir, output_zip_path):
 
         print(f"Archive '{output_zip_path}' créée avec succès.")
 
-        shutil.rmtree(source_dir)
-        print(f"Dossier source '{source_dir}' supprimé avec succès.")
+        #shutil.rmtree(source_dir)
+        #print(f"Dossier source '{source_dir}' supprimé avec succès.")
 
     except FileNotFoundError:
         print(f"Erreur : Un fichier ou dossier n'a pas été trouvé pendant l'opération.")
